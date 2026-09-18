@@ -1,0 +1,70 @@
+metadata:
+  name: custom-semantic-segment
+  namespace: cvat
+  annotations:
+    name: 'Smart Semantic Segmentation'
+    type: detector
+    framework: custom
+    spec: |
+      [
+        {"id": 0, "name": "road", "type": "mask"},
+        {"id": 1, "name": "sidewalk", "type": "mask"},
+        {"id": 2, "name": "building", "type": "mask"},
+        {"id": 3, "name": "wall", "type": "mask"},
+        {"id": 4, "name": "fence", "type": "mask"},
+        {"id": 5, "name": "pole", "type": "mask"},
+        {"id": 6, "name": "traffic_light", "type": "mask"},
+        {"id": 7, "name": "traffic_sign", "type": "mask"},
+        {"id": 8, "name": "vegetation", "type": "mask"},
+        {"id": 9, "name": "terrain", "type": "mask"},
+        {"id": 10, "name": "sky", "type": "mask"},
+        {"id": 11, "name": "person", "type": "mask"},
+        {"id": 12, "name": "rider", "type": "mask"},
+        {"id": 13, "name": "car", "type": "mask"},
+        {"id": 14, "name": "truck", "type": "mask"},
+        {"id": 15, "name": "bus", "type": "mask"},
+        {"id": 16, "name": "train", "type": "mask"},
+        {"id": 17, "name": "motorcycle", "type": "mask"},
+        {"id": 18, "name": "bicycle", "type": "mask"}
+      ]
+
+spec:
+  description: 'Smart semantic segmentation using SegFormer/EoMT + SAM2 boundary refinement with image enhancement'
+  runtime: 'python:3.10'
+  handler: main:handler
+  eventTimeout: 120s
+
+  build:
+    image: cvat.custom.semantic-segment
+    baseImage: python:3.10-slim
+    directives:
+      preCopy:
+        - kind: RUN
+          value: apt-get update && apt-get install --no-install-recommends -y libgl1 libglib2.0-0 && rm -rf /var/lib/apt/lists/*
+        - kind: WORKDIR
+          value: /opt/nuclio
+        - kind: RUN
+          value: pip install --no-cache-dir pillow numpy requests opencv-python-headless
+
+  env:
+    - name: MODEL_SERVER_URL
+      value: "http://host.docker.internal:8001"
+    - name: ANNOTATION_FORMAT
+      value: "polygon"
+    - name: MIN_ANNOTATION_AREA
+      value: "50"
+
+  triggers:
+    myHttpTrigger:
+      numWorkers: 1
+      kind: 'http'
+      workerAvailabilityTimeoutMilliseconds: 10000
+      attributes:
+        maxRequestBodySize: 67108864
+
+  platform:
+    attributes:
+      restartPolicy:
+        name: always
+        maximumRetryCount: 3
+      mountMode: volume

@@ -1,0 +1,7 @@
+# CVAT Smart Model Service — Dev/Tools Dependencies
+# Model service dependencies are in model-service/requirements.txt
+# These are for running CLI tools on the host machine
+
+openai>=1.0
+pypdf>=4.0
+python-docx>=1.1

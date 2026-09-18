@@ -1,0 +1,88 @@
+# CVAT serverless function: object detection (Bounding Box).
+#
+# Deployed into the local nuclio under project `cvat`, which is what makes it
+# appear on the CVAT Models page. See nuclio/README.md for the deploy command.
+#
+# The regions between `# >>> GENERATED:<key>` and `# <<< GENERATED:<key>` are
+# produced by `tools/sync_taxonomy.py` from `taxonomy.yaml`. Do not edit them by
+# hand; run `python tools/sync_taxonomy.py --write` instead. Everything outside
+# the markers is hand-written and safe to edit.
+metadata:
+  name: smart-bbox
+  namespace: nuclio
+  labels:
+    nuclio.io/project-name: cvat
+  annotations:
+    # >>> GENERATED:model_title
+    name: "Smart BBox (YOLO26)"
+    # <<< GENERATED:model_title
+    type: detector
+    framework: custom
+    # >>> GENERATED:help_message
+    help_message: >-
+      Bounding boxes for the 10 guideline object classes, produced by YOLO26m.
+    # <<< GENERATED:help_message
+    # >>> GENERATED:label_spec
+    spec: |
+      [
+        {"id":  0, "name": "pedestrian",     "type": "rectangle"},
+        {"id":  1, "name": "rider",          "type": "rectangle"},
+        {"id":  2, "name": "car",            "type": "rectangle"},
+        {"id":  3, "name": "truck",          "type": "rectangle"},
+        {"id":  4, "name": "bus",            "type": "rectangle"},
+        {"id":  5, "name": "train",          "type": "rectangle"},
+        {"id":  6, "name": "motorcycle",     "type": "rectangle"},
+        {"id":  7, "name": "bicycle",        "type": "rectangle"},
+        {"id":  8, "name": "traffic light",  "type": "rectangle"},
+        {"id":  9, "name": "traffic sign",   "type": "rectangle"}
+      ]
+    # <<< GENERATED:label_spec
+
+spec:
+  # >>> GENERATED:description
+  description: >-
+    Object detection with YOLO26m, mapped to the 10 object classes of the
+    annotation guideline. Returns CVAT rectangles.
+  # <<< GENERATED:description
+  runtime: 'python:3.10'
+  handler: main:handler
+  eventTimeout: 180s
+
+  build:
+    image: cvat.smart.bbox:latest
+    directives:
+      preCopy:
+        - kind: WORKDIR
+          value: /opt/nuclio
+        - kind: RUN
+          value: pip install --no-cache-dir numpy pillow opencv-python-headless requests
+
+  env:
+    - name: TASK
+      value: "bbox"
+    - name: MODEL_SERVER_URL
+      value: "http://host.docker.internal:8001"
+    - name: MODEL_SERVER_TIMEOUT
+      value: "180"
+    # TAXONOMY_JSON is injected by `tools/deploy_nuclio.py` from taxonomy.yaml.
+    # Rename emitted labels to match the CVAT task labels, e.g. for a task that
+    # uses the Cityscapes spellings:
+    #   LABEL_MAP={"pedestrian":"person","traffic light":"traffic_light","traffic sign":"traffic_sign"}
+    - name: LABEL_MAP
+      value: "{}"
+
+  triggers:
+    myHttpTrigger:
+      numWorkers: 1
+      kind: 'http'
+      workerAvailabilityTimeoutMilliseconds: 10000
+      attributes:
+        maxRequestBodySize: 67108864
+
+  platform:
+    attributes:
+      network: cvat_cvat
+      mountMode: volume
+      restartPolicy:
+        name: always
+        maximumRetryCount: 3

@@ -1,0 +1,510 @@
+{
+  "version": 1,
+  "generated_by": "tools/sync_taxonomy.py",
+  "source_of_truth": "taxonomy.yaml",
+  "groups": [
+    {
+      "id": "objects",
+      "title": "Object instance",
+      "shape": "rectangle",
+      "task": "bbox",
+      "function": "smart-bbox",
+      "labels": [
+        {
+          "name": "pedestrian",
+          "coco": [
+            "person"
+          ],
+          "color": [
+            220,
+            20,
+            60
+          ]
+        },
+        {
+          "name": "rider",
+          "color": [
+            255,
+            120,
+            0
+          ],
+          "note": "COCO detection không có class `rider`; người lái xe bị nhận là `person` -> `pedestrian`. Label vẫn khai báo để task có sẵn."
+        },
+        {
+          "name": "car",
+          "coco": [
+            "car"
+          ],
+          "color": [
+            0,
+            0,
+            230
+          ]
+        },
+        {
+          "name": "truck",
+          "coco": [
+            "truck"
+          ],
+          "color": [
+            70,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "bus",
+          "coco": [
+            "bus"
+          ],
+          "color": [
+            100,
+            60,
+            0
+          ]
+        },
+        {
+          "name": "train",
+          "coco": [
+            "train"
+          ],
+          "color": [
+            120,
+            120,
+            120
+          ]
+        },
+        {
+          "name": "motorcycle",
+          "coco": [
+            "motorcycle"
+          ],
+          "color": [
+            230,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "bicycle",
+          "coco": [
+            "bicycle"
+          ],
+          "color": [
+            32,
+            11,
+            119
+          ]
+        },
+        {
+          "name": "traffic light",
+          "coco": [
+            "traffic light"
+          ],
+          "color": [
+            30,
+            170,
+            250
+          ]
+        },
+        {
+          "name": "traffic sign",
+          "coco": [
+            "stop sign"
+          ],
+          "color": [
+            0,
+            220,
+            220
+          ],
+          "note": "COCO không có class \"biển báo chung\"; chỉ xấp xỉ từ `stop sign`."
+        }
+      ]
+    },
+    {
+      "id": "drivable",
+      "title": "Drivable area",
+      "shape": "polygon",
+      "task": "drivable",
+      "function": "smart-drivable",
+      "labels": [
+        {
+          "name": "area/drivable",
+          "coco": [
+            "road"
+          ],
+          "color": [
+            255,
+            165,
+            0
+          ],
+          "note": "Xấp xỉ từ COCO `road`, không phải model train trên BDD100K."
+        },
+        {
+          "name": "area/alternative",
+          "coco": [
+            "pavement-merged"
+          ],
+          "color": [
+            30,
+            144,
+            255
+          ],
+          "note": "Xấp xỉ từ COCO `pavement-merged`."
+        }
+      ]
+    },
+    {
+      "id": "lane",
+      "title": "Lane marking",
+      "shape": "polyline",
+      "task": null,
+      "function": null,
+      "labels": [
+        {
+          "name": "lane/crosswalk"
+        },
+        {
+          "name": "lane/double white"
+        },
+        {
+          "name": "lane/double yellow"
+        },
+        {
+          "name": "lane/road curb"
+        },
+        {
+          "name": "lane/single other"
+        },
+        {
+          "name": "lane/single white"
+        },
+        {
+          "name": "lane/single yellow"
+        }
+      ],
+      "supported": false,
+      "unsupported_reason": "COCO panoptic has no `lane/*` class and the training sets contain zero lane annotations, so no deployed model can produce polyline lane marking."
+    },
+    {
+      "id": "semantic",
+      "title": "Semantic segmentation",
+      "shape": "polygon",
+      "task": "semantic",
+      "function": "smart-semantic",
+      "labels": [
+        {
+          "name": "road",
+          "coco": [
+            "road"
+          ]
+        },
+        {
+          "name": "sidewalk",
+          "coco": [
+            "pavement-merged",
+            "platform"
+          ]
+        },
+        {
+          "name": "building",
+          "coco": [
+            "building-other-merged",
+            "house"
+          ]
+        },
+        {
+          "name": "wall",
+          "coco": [
+            "wall-brick",
+            "wall-stone",
+            "wall-tile",
+            "wall-wood",
+            "wall-other-merged"
+          ]
+        },
+        {
+          "name": "fence",
+          "coco": [
+            "fence-merged"
+          ]
+        },
+        {
+          "name": "pole",
+          "note": "COCO panoptic không có class cột/trụ -> không bao giờ sinh ra."
+        },
+        {
+          "name": "traffic_light",
+          "coco": [
+            "traffic_light"
+          ]
+        },
+        {
+          "name": "traffic_sign",
+          "coco": [
+            "stop_sign"
+          ],
+          "note": "Xấp xỉ từ COCO `stop_sign`."
+        },
+        {
+          "name": "vegetation",
+          "coco": [
+            "tree-merged",
+            "grass-merged",
+            "flower"
+          ]
+        },
+        {
+          "name": "terrain",
+          "coco": [
+            "dirt-merged",
+            "sand",
+            "mountain-merged",
+            "rock-merged",
+            "gravel",
+            "snow"
+          ]
+        },
+        {
+          "name": "sky",
+          "coco": [
+            "sky-other-merged"
+          ]
+        },
+        {
+          "name": "person",
+          "coco": [
+            "person"
+          ]
+        },
+        {
+          "name": "rider",
+          "note": "COCO panoptic không có class người lái -> không bao giờ sinh ra."
+        },
+        {
+          "name": "car",
+          "coco": [
+            "car"
+          ]
+        },
+        {
+          "name": "truck",
+          "coco": [
+            "truck"
+          ]
+        },
+        {
+          "name": "bus",
+          "coco": [
+            "bus"
+          ]
+        },
+        {
+          "name": "train",
+          "coco": [
+            "train"
+          ]
+        },
+        {
+          "name": "motorcycle",
+          "coco": [
+            "motorcycle"
+          ]
+        },
+        {
+          "name": "bicycle",
+          "coco": [
+            "bicycle"
+          ]
+        }
+      ]
+    }
+  ],
+  "tasks": {
+    "bbox": {
+      "group": "objects",
+      "shape": "rectangle",
+      "model_title": "Smart BBox (YOLO26)",
+      "help_message": "Bounding boxes for the 10 guideline object classes, produced by YOLO26m.",
+      "description": "Object detection with YOLO26m, mapped to the 10 object classes of the annotation guideline. Returns CVAT rectangles.",
+      "declared": [
+        "pedestrian",
+        "rider",
+        "car",
+        "truck",
+        "bus",
+        "train",
+        "motorcycle",
+        "bicycle",
+        "traffic light",
+        "traffic sign"
+      ],
+      "coco_map": {
+        "person": "pedestrian",
+        "car": "car",
+        "truck": "truck",
+        "bus": "bus",
+        "train": "train",
+        "motorcycle": "motorcycle",
+        "bicycle": "bicycle",
+        "traffic light": "traffic light",
+        "stop sign": "traffic sign"
+      },
+      "colors": {
+        "pedestrian": [
+          220,
+          20,
+          60
+        ],
+        "rider": [
+          255,
+          120,
+          0
+        ],
+        "car": [
+          0,
+          0,
+          230
+        ],
+        "truck": [
+          70,
+          0,
+          0
+        ],
+        "bus": [
+          100,
+          60,
+          0
+        ],
+        "train": [
+          120,
+          120,
+          120
+        ],
+        "motorcycle": [
+          230,
+          0,
+          0
+        ],
+        "bicycle": [
+          32,
+          11,
+          119
+        ],
+        "traffic light": [
+          30,
+          170,
+          250
+        ],
+        "traffic sign": [
+          0,
+          220,
+          220
+        ]
+      }
+    },
+    "drivable": {
+      "group": "drivable",
+      "shape": "polygon",
+      "model_title": "Smart Drivable Area",
+      "help_message": "Drivable-area polygons approximated from COCO road/pavement. Lane marking (polyline) is not supported.",
+      "description": "Drivable-area segmentation returned as CVAT polygons. `area/drivable` is approximated from COCO `road`, `area/alternative` from COCO `pavement-merged`. Lane marking is not produced.",
+      "declared": [
+        "area/drivable",
+        "area/alternative"
+      ],
+      "coco_map": {
+        "road": "area/drivable",
+        "pavement-merged": "area/alternative"
+      },
+      "colors": {
+        "area/drivable": [
+          255,
+          165,
+          0
+        ],
+        "area/alternative": [
+          30,
+          144,
+          255
+        ]
+      }
+    },
+    "semantic": {
+      "group": "semantic",
+      "shape": "polygon",
+      "model_title": "Smart Semantic (EoMT COCO)",
+      "help_message": "COCO-panoptic semantic segmentation mapped to the 19-class taxonomy. `pole` and `rider` are unavailable; `traffic_sign` is approximated from COCO stop sign.",
+      "description": "Semantic segmentation via EoMT-DINOv3 COCO-panoptic, mapped onto the 19-class Cityscapes taxonomy and returned as CVAT polygons. Approximate: COCO has no `pole` or `rider`, and `traffic_sign` comes from `stop_sign`.",
+      "declared": [
+        "road",
+        "sidewalk",
+        "building",
+        "wall",
+        "fence",
+        "pole",
+        "traffic_light",
+        "traffic_sign",
+        "vegetation",
+        "terrain",
+        "sky",
+        "person",
+        "rider",
+        "car",
+        "truck",
+        "bus",
+        "train",
+        "motorcycle",
+        "bicycle"
+      ],
+      "coco_map": {
+        "road": "road",
+        "pavement-merged": "sidewalk",
+        "platform": "sidewalk",
+        "building-other-merged": "building",
+        "house": "building",
+        "wall-brick": "wall",
+        "wall-stone": "wall",
+        "wall-tile": "wall",
+        "wall-wood": "wall",
+        "wall-other-merged": "wall",
+        "fence-merged": "fence",
+        "traffic_light": "traffic_light",
+        "stop_sign": "traffic_sign",
+        "tree-merged": "vegetation",
+        "grass-merged": "vegetation",
+        "flower": "vegetation",
+        "dirt-merged": "terrain",
+        "sand": "terrain",
+        "mountain-merged": "terrain",
+        "rock-merged": "terrain",
+        "gravel": "terrain",
+        "snow": "terrain",
+        "sky-other-merged": "sky",
+        "person": "person",
+        "car": "car",
+        "truck": "truck",
+        "bus": "bus",
+        "train": "train",
+        "motorcycle": "motorcycle",
+        "bicycle": "bicycle"
+      },
+      "colors": {}
+    }
+  },
+  "unsupported": {
+    "lane": {
+      "labels": [
+        "lane/crosswalk",
+        "lane/double white",
+        "lane/double yellow",
+        "lane/road curb",
+        "lane/single other",
+        "lane/single white",
+        "lane/single yellow"
+      ],
+      "shape": "polyline",
+      "reason": "COCO panoptic has no `lane/*` class and the training sets contain zero lane annotations, so no deployed model can produce polyline lane marking."
+    }
+  }
+}

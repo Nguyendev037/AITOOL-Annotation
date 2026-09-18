@@ -1,0 +1,11 @@
+{
+  "model_name": "Smart Semantic Segmentation",
+  "model_slug": "semantic-segment",
+  "model_source": "sidecar:model-service",
+  "architecture": "sidecar+nuclio",
+  "task": "semantic_segmentation",
+  "output_geometry": ["mask", "polygon"],
+  "labels": 19,
+  "label_source": "cityscapes",
+  "status": "scaffolded"
+}

@@ -1,0 +1,49 @@
+# CVAT Smart Model Service — Docker Compose
+# Usage: docker compose up -d --build model-service
+#
+# The SAM2 checkpoint must be present at ./sam-service/checkpoints/
+# before starting (gitignored; not committed). The service exposes port
+# 8001 on the host for Nuclio adapters and batch runners to reach.
+
+version: "3.8"
+
+services:
+  model-service:
+    build:
+      context: ./model-service
+      dockerfile: Dockerfile
+    image: cvat-smart-model-service:latest
+    container_name: cvat-smart-model
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./sam-service/checkpoints:/models:ro
+      - model-hf-cache:/opt/hf-cache
+      - model-ultralytics:/opt/ultralytics
+    environment:
+      - SAM2_DEVICE=cuda
+      - YOLO26_MODEL=${YOLO26_MODEL:-yolo26m.pt}
+      - YOLO26_CONF=${YOLO26_CONF:-0.25}
+      - YOLO26_IOU=${YOLO26_IOU:-0.45}
+      - YOLO_CONFIG_DIR=/opt/ultralytics
+      - SAM2_CONFIG=configs/sam2.1/sam2.1_hiera_l.yaml
+      - SEMANTIC_BACKEND=${SEMANTIC_BACKEND:-eomt}
+      - SEMANTIC_MODEL_ID=${SEMANTIC_MODEL_ID:-tue-mps/eomt-dinov3-coco-panoptic-large-640}
+      - SEMANTIC_REFINE=${SEMANTIC_REFINE:-true}
+      - SEMANTIC_SPLIT_INSTANCES=${SEMANTIC_SPLIT_INSTANCES:-true}
+      - SEMANTIC_MIN_COMPONENT_AREA=${SEMANTIC_MIN_COMPONENT_AREA:-100}
+      - ENHANCE_ENABLED=${ENHANCE_ENABLED:-true}
+      - ENHANCE_DARK_REGIONS=${ENHANCE_DARK_REGIONS:-true}
+      - ENHANCE_MOTION_BLUR=${ENHANCE_MOTION_BLUR:-false}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  model-hf-cache:
+  model-ultralytics:

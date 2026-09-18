@@ -1,0 +1,3 @@
+interface:
+  display_name: "CVAT Model Integrator"
+  short_description: "Add and validate custom AI models in local CVAT"

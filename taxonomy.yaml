@@ -1,0 +1,205 @@
+# =============================================================================
+# TAXONOMY — NGUỒN SỰ THẬT DUY NHẤT CHO LABEL
+# =============================================================================
+#
+# Đây là file DUY NHẤT bạn sửa khi taxonomy thay đổi (ví dụ khi cập nhật tài
+# liệu trong `guildlline/` hoặc `guideline/`).
+#
+# Mọi thứ suy ra từ file này được sinh tự động bởi `tools/sync_taxonomy.py`:
+#
+#   taxonomy.yaml
+#        │
+#        ├─► nuclio/functions/{bbox,semantic,drivable}.yaml
+#        │       metadata.annotations.spec   ← danh sách label CVAT hiển thị
+#        │
+#        ├─► model-service/taxonomy.json
+#        │       model-service/handlers/detect.py   ← map COCO -> guideline
+#        │       model-service/handlers/segment.py  ← map COCO -> drivable
+#        │
+#        ├─► nuclio/src/main.py  (qua env TAXONOMY_JSON do tools/deploy_nuclio.py nhúng)
+#        │
+#        └─► run_results.py      ← màu vẽ preview
+#
+# Kiểm tra lệch (drift) bất cứ lúc nào:   python tools/sync_taxonomy.py --check
+# Sinh lại toàn bộ:                        python tools/sync_taxonomy.py --write
+#
+# Nguồn gốc taxonomy:
+#   guildlline/Annotation_Guideline_BBox_Polygon_Polyline.pdf
+#   guildlline/Semantic_Segmentation_Annotation_Guideline.pdf
+#   guideline/README.md
+# =============================================================================
+
+version: 1
+
+groups:
+
+  # ---------------------------------------------------------------------------
+  # Nhóm 1 — Object instance (Rectangle / Bounding Box)
+  # ---------------------------------------------------------------------------
+  - id: objects
+    title: Object instance
+    shape: rectangle
+    task: bbox
+    function: smart-bbox
+    model_title: Smart BBox (YOLO26)
+    help_message: >-
+      Bounding boxes for the 10 guideline object classes, produced by YOLO26m.
+    description: >-
+      Object detection with YOLO26m, mapped to the 10 object classes of the
+      annotation guideline. Returns CVAT rectangles.
+    labels:
+      - name: pedestrian
+        coco: [person]
+        color: [220, 20, 60]
+      - name: rider
+        coco: []
+        color: [255, 120, 0]
+        note: >-
+          COCO detection không có class `rider`; người lái xe bị nhận là
+          `person` -> `pedestrian`. Label vẫn khai báo để task có sẵn.
+      - name: car
+        coco: [car]
+        color: [0, 0, 230]
+      - name: truck
+        coco: [truck]
+        color: [70, 0, 0]
+      - name: bus
+        coco: [bus]
+        color: [100, 60, 0]
+      - name: train
+        coco: [train]
+        color: [120, 120, 120]
+      - name: motorcycle
+        coco: [motorcycle]
+        color: [230, 0, 0]
+      - name: bicycle
+        coco: [bicycle]
+        color: [32, 11, 119]
+      - name: traffic light
+        coco: [traffic light]
+        color: [30, 170, 250]
+      - name: traffic sign
+        coco: [stop sign]
+        color: [0, 220, 220]
+        note: >-
+          COCO không có class "biển báo chung"; chỉ xấp xỉ từ `stop sign`.
+
+  # ---------------------------------------------------------------------------
+  # Nhóm 2 — Drivable area (Polygon)
+  # ---------------------------------------------------------------------------
+  - id: drivable
+    title: Drivable area
+    shape: polygon
+    task: drivable
+    function: smart-drivable
+    model_title: Smart Drivable Area
+    help_message: >-
+      Drivable-area polygons approximated from COCO road/pavement. Lane marking
+      (polyline) is not supported.
+    description: >-
+      Drivable-area segmentation returned as CVAT polygons. `area/drivable` is
+      approximated from COCO `road`, `area/alternative` from COCO
+      `pavement-merged`. Lane marking is not produced.
+    labels:
+      - name: area/drivable
+        coco: [road]
+        color: [255, 165, 0]
+        note: >-
+          Xấp xỉ từ COCO `road`, không phải model train trên BDD100K.
+      - name: area/alternative
+        coco: [pavement-merged]
+        color: [30, 144, 255]
+        note: >-
+          Xấp xỉ từ COCO `pavement-merged`.
+
+  # ---------------------------------------------------------------------------
+  # Nhóm 3 — Lane marking (Polyline)
+  #
+  # KHÔNG có function nào sinh ra nhóm này: COCO panoptic không có class
+  # `lane/*`, và cả `train/1354` lẫn `train/1571` đều có 0 annotation cho
+  # nhóm này. Label vẫn được khai báo để công cụ tạo task CVAT tạo đủ label.
+  # ---------------------------------------------------------------------------
+  - id: lane
+    title: Lane marking
+    shape: polyline
+    task: null
+    function: null
+    supported: false
+    unsupported_reason: >-
+      COCO panoptic has no `lane/*` class and the training sets contain zero
+      lane annotations, so no deployed model can produce polyline lane marking.
+    labels:
+      - name: lane/crosswalk
+        coco: []
+      - name: lane/double white
+        coco: []
+      - name: lane/double yellow
+        coco: []
+      - name: lane/road curb
+        coco: []
+      - name: lane/single other
+        coco: []
+      - name: lane/single white
+        coco: []
+      - name: lane/single yellow
+        coco: []
+
+  # ---------------------------------------------------------------------------
+  # Nhóm 4 — Semantic segmentation (19 class Cityscapes)
+  # ---------------------------------------------------------------------------
+  - id: semantic
+    title: Semantic segmentation
+    shape: polygon
+    task: semantic
+    function: smart-semantic
+    model_title: Smart Semantic (EoMT COCO)
+    help_message: >-
+      COCO-panoptic semantic segmentation mapped to the 19-class taxonomy.
+      `pole` and `rider` are unavailable; `traffic_sign` is approximated from
+      COCO stop sign.
+    description: >-
+      Semantic segmentation via EoMT-DINOv3 COCO-panoptic, mapped onto the
+      19-class Cityscapes taxonomy and returned as CVAT polygons. Approximate:
+      COCO has no `pole` or `rider`, and `traffic_sign` comes from `stop_sign`.
+    labels:
+      - name: road
+        coco: [road]
+      - name: sidewalk
+        coco: [pavement-merged, platform]
+      - name: building
+        coco: [building-other-merged, house]
+      - name: wall
+        coco: [wall-brick, wall-stone, wall-tile, wall-wood, wall-other-merged]
+      - name: fence
+        coco: [fence-merged]
+      - name: pole
+        coco: []
+        note: COCO panoptic không có class cột/trụ -> không bao giờ sinh ra.
+      - name: traffic_light
+        coco: [traffic_light]
+      - name: traffic_sign
+        coco: [stop_sign]
+        note: Xấp xỉ từ COCO `stop_sign`.
+      - name: vegetation
+        coco: [tree-merged, grass-merged, flower]
+      - name: terrain
+        coco: [dirt-merged, sand, mountain-merged, rock-merged, gravel, snow]
+      - name: sky
+        coco: [sky-other-merged]
+      - name: person
+        coco: [person]
+      - name: rider
+        coco: []
+        note: COCO panoptic không có class người lái -> không bao giờ sinh ra.
+      - name: car
+        coco: [car]
+      - name: truck
+        coco: [truck]
+      - name: bus
+        coco: [bus]
+      - name: train
+        coco: [train]
+      - name: motorcycle
+        coco: [motorcycle]
+      - name: bicycle
+        coco: [bicycle]

@@ -1,0 +1,107 @@
+# CVAT serverless function: semantic segmentation (Polygon).
+#
+# IMPORTANT — this is an approximation, not a trained semantic model.
+# The backend is EoMT-DINOv3 COCO-panoptic (133 classes). The adapter maps the
+# COCO classes it can onto the 19-class Cityscapes taxonomy below and drops the
+# rest. Two target classes cannot be produced at all because COCO panoptic has
+# no such class: `pole` and `rider`. `traffic_sign` is approximated from COCO
+# `stop_sign`. See nuclio/README.md for the full limitation list.
+#
+# The regions between `# >>> GENERATED:<key>` and `# <<< GENERATED:<key>` are
+# produced by `tools/sync_taxonomy.py` from `taxonomy.yaml`. Do not edit them by
+# hand; run `python tools/sync_taxonomy.py --write` instead.
+metadata:
+  name: smart-semantic
+  namespace: nuclio
+  labels:
+    nuclio.io/project-name: cvat
+  annotations:
+    # >>> GENERATED:model_title
+    name: "Smart Semantic (EoMT COCO)"
+    # <<< GENERATED:model_title
+    type: detector
+    framework: custom
+    # >>> GENERATED:help_message
+    help_message: >-
+      COCO-panoptic semantic segmentation mapped to the 19-class taxonomy.
+      `pole` and `rider` are unavailable; `traffic_sign` is approximated from
+      COCO stop sign.
+    # <<< GENERATED:help_message
+    # >>> GENERATED:label_spec
+    spec: |
+      [
+        {"id":  0, "name": "road",           "type": "polygon"},
+        {"id":  1, "name": "sidewalk",       "type": "polygon"},
+        {"id":  2, "name": "building",       "type": "polygon"},
+        {"id":  3, "name": "wall",           "type": "polygon"},
+        {"id":  4, "name": "fence",          "type": "polygon"},
+        {"id":  5, "name": "pole",           "type": "polygon"},
+        {"id":  6, "name": "traffic_light",  "type": "polygon"},
+        {"id":  7, "name": "traffic_sign",   "type": "polygon"},
+        {"id":  8, "name": "vegetation",     "type": "polygon"},
+        {"id":  9, "name": "terrain",        "type": "polygon"},
+        {"id": 10, "name": "sky",            "type": "polygon"},
+        {"id": 11, "name": "person",         "type": "polygon"},
+        {"id": 12, "name": "rider",          "type": "polygon"},
+        {"id": 13, "name": "car",            "type": "polygon"},
+        {"id": 14, "name": "truck",          "type": "polygon"},
+        {"id": 15, "name": "bus",            "type": "polygon"},
+        {"id": 16, "name": "train",          "type": "polygon"},
+        {"id": 17, "name": "motorcycle",     "type": "polygon"},
+        {"id": 18, "name": "bicycle",        "type": "polygon"}
+      ]
+    # <<< GENERATED:label_spec
+
+spec:
+  # >>> GENERATED:description
+  description: >-
+    Semantic segmentation via EoMT-DINOv3 COCO-panoptic, mapped onto the
+    19-class Cityscapes taxonomy and returned as CVAT polygons. Approximate:
+    COCO has no `pole` or `rider`, and `traffic_sign` comes from `stop_sign`.
+  # <<< GENERATED:description
+  runtime: 'python:3.10'
+  handler: main:handler
+  eventTimeout: 300s
+
+  build:
+    image: cvat.smart.semantic:latest
+    directives:
+      preCopy:
+        - kind: WORKDIR
+          value: /opt/nuclio
+        - kind: RUN
+          value: pip install --no-cache-dir numpy pillow opencv-python-headless requests
+
+  env:
+    - name: TASK
+      value: "semantic"
+    - name: MODEL_SERVER_URL
+      value: "http://host.docker.internal:8001"
+    - name: MODEL_SERVER_TIMEOUT
+      value: "300"
+    - name: MIN_ANNOTATION_AREA
+      value: "200"
+    - name: POLYGON_EPSILON
+      value: "0.01"
+    # TAXONOMY_JSON (the COCO -> guideline class map) is injected here by
+    # `tools/deploy_nuclio.py` from taxonomy.yaml. The function refuses to start
+    # without it, so the label mapping can never silently drift from the
+    # taxonomy again.
+    - name: LABEL_MAP
+      value: "{}"
+
+  triggers:
+    myHttpTrigger:
+      numWorkers: 1
+      kind: 'http'
+      workerAvailabilityTimeoutMilliseconds: 10000
+      attributes:
+        maxRequestBodySize: 67108864
+
+  platform:
+    attributes:
+      network: cvat_cvat
+      mountMode: volume
+      restartPolicy:
+        name: always
+        maximumRetryCount: 3

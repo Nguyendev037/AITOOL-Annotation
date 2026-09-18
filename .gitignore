@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+labels.json
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.wheels/
+.dsh-vision-toolkit/
+work/
+results/
+.browseruse/
+sam-service/checkpoints/
+nuclio/build/
+*.pem
+*.key

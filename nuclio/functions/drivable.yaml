@@ -1,0 +1,86 @@
+# CVAT serverless function: drivable area (Polygon).
+#
+# Backend is EoMT-DINOv3 COCO-panoptic. COCO has no `area/drivable` class, so
+# the labels are approximated from `road` -> `area/drivable` and
+# `pavement-merged` -> `area/alternative`.
+#
+# Lane marking (Polyline) is deliberately NOT advertised: COCO panoptic has no
+# `lane/*` class and the training sets in `train/` contain zero lane
+# annotations, so no model can produce it. See nuclio/README.md.
+#
+# The regions between `# >>> GENERATED:<key>` and `# <<< GENERATED:<key>` are
+# produced by `tools/sync_taxonomy.py` from `taxonomy.yaml`. Do not edit them by
+# hand; run `python tools/sync_taxonomy.py --write` instead.
+metadata:
+  name: smart-drivable
+  namespace: nuclio
+  labels:
+    nuclio.io/project-name: cvat
+  annotations:
+    # >>> GENERATED:model_title
+    name: "Smart Drivable Area"
+    # <<< GENERATED:model_title
+    type: detector
+    framework: custom
+    # >>> GENERATED:help_message
+    help_message: >-
+      Drivable-area polygons approximated from COCO road/pavement. Lane marking
+      (polyline) is not supported.
+    # <<< GENERATED:help_message
+    # >>> GENERATED:label_spec
+    spec: |
+      [
+        {"id":  0, "name": "area/drivable",     "type": "polygon"},
+        {"id":  1, "name": "area/alternative",  "type": "polygon"}
+      ]
+    # <<< GENERATED:label_spec
+
+spec:
+  # >>> GENERATED:description
+  description: >-
+    Drivable-area segmentation returned as CVAT polygons. `area/drivable` is
+    approximated from COCO `road`, `area/alternative` from COCO
+    `pavement-merged`. Lane marking is not produced.
+  # <<< GENERATED:description
+  runtime: 'python:3.10'
+  handler: main:handler
+  eventTimeout: 300s
+
+  build:
+    image: cvat.smart.drivable:latest
+    directives:
+      preCopy:
+        - kind: WORKDIR
+          value: /opt/nuclio
+        - kind: RUN
+          value: pip install --no-cache-dir numpy pillow opencv-python-headless requests
+
+  env:
+    - name: TASK
+      value: "drivable"
+    - name: MODEL_SERVER_URL
+      value: "http://host.docker.internal:8001"
+    - name: MODEL_SERVER_TIMEOUT
+      value: "300"
+    - name: MIN_ANNOTATION_AREA
+      value: "200"
+    - name: POLYGON_EPSILON
+      value: "0.01"
+    - name: LABEL_MAP
+      value: "{}"
+
+  triggers:
+    myHttpTrigger:
+      numWorkers: 1
+      kind: 'http'
+      workerAvailabilityTimeoutMilliseconds: 10000
+      attributes:
+        maxRequestBodySize: 67108864
+
+  platform:
+    attributes:
+      network: cvat_cvat
+      mountMode: volume
+      restartPolicy:
+        name: always
+        maximumRetryCount: 3

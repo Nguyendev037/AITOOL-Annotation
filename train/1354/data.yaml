@@ -1,0 +1,34 @@
+names:
+  0: pedestrian
+  1: rider
+  2: car
+  3: truck
+  4: bus
+  5: train
+  6: motorcycle
+  7: bicycle
+  8: traffic light
+  9: traffic sign
+  10: area/alternative
+  11: area/drivable
+  12: lane/crosswalk
+  13: lane/double white
+  14: lane/double yellow
+  15: lane/road curb
+  16: lane/single other
+  17: lane/single white
+  18: lane/single yellow
+  19: road
+  20: sidewalk
+  21: building
+  22: wall
+  23: fence
+  24: pole
+  25: vegetation
+  26: terrain
+  27: sky
+  28: person
+  29: traffic_light
+  30: traffic_sign
+path: .
+train: train.txt

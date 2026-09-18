@@ -1,0 +1,5 @@
+{
+  "pedestrian": "person",
+  "traffic light": "traffic_light",
+  "traffic sign": "traffic_sign"
+}

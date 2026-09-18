@@ -1,0 +1,27 @@
+flowchart TD
+    subgraph Input[Dau vao]
+        IMG[test/detect/*.jpg]
+        PDF[guildlline/*.pdf]
+        MD[guideline/*.md]
+    end
+
+    subgraph Service[model-service Docker + CUDA]
+        APP[app.py FastAPI]
+        DET[handlers/detect.py<br/>YOLO26 BBox]
+        SEG[handlers/segment.py<br/>EoMT + SAM2]
+        ENH[enhancement.py]
+    end
+
+    subgraph Output[Dau ra]
+        RES[results/<br/>detections + previews]
+        NUCLIO[nuclio adapter<br/>polygon/mask -> CVAT]
+    end
+
+    IMG --> APP
+    APP --> DET
+    APP --> SEG
+    APP --> ENH
+    DET --> RES
+    SEG --> NUCLIO
+    MD -. taxonomy BBox .-> DET
+    PDF -. guideline goc .-> MD
