@@ -18,7 +18,12 @@ ENV DEBIAN_FRONTEND=noninteractive \
     ENHANCE_ENABLED=true \
     ENHANCE_DARK_REGIONS=true \
     ENHANCE_MOTION_BLUR=false \
-    YOLO26_MODEL=yolo26m.pt \
+    # Absolute path into the read-only bind mount defined in docker-compose.yml.
+    # A bare relative name ("yolo26m.pt") resolves against WORKDIR and therefore
+    # lives in the ephemeral writable layer: it is silently lost on every
+    # container recreate, which triggers a 42 MB runtime GitHub download that
+    # blocks the whole service. Keep this in sync with docker-compose.yml.
+    YOLO26_MODEL=/weights/yolo26m.pt \
     YOLO26_CONF=0.25 \
     YOLO26_IOU=0.45 \
     YOLO_CONFIG_DIR=/opt/ultralytics

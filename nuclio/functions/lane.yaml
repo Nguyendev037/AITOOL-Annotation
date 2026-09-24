@@ -1,0 +1,101 @@
+# CVAT serverless function: lane marking (Polyline).
+#
+# Seven `lane/*` classes from the annotation guideline. The backend is a
+# classical-CV detector in model-service that works on the metric top-down
+# ("bird") view of the road plane -- no trained network, because no public
+# checkpoint predicts these classes and this repo has zero lane annotations to
+# train on. It runs on the CPU and therefore adds no VRAM.
+#
+# CVAT receives `type: "polyline"` with a flat `[x0, y0, x1, y1, ...]` points
+# list. The shape is supported: the engine validator has a dedicated POLYLINE
+# branch requiring an even coordinate count of at least four.
+#
+# Known limits, deliberately declared rather than hidden:
+#   * markings are traced over roughly the bottom 40% of the frame (the model
+#     caps detection at LANE_MAX_DEPTH_M, 12 m, to keep the bird raster from
+#     upsampling horizon noise into fake markings);
+#   * `lane/double *` is only resolved where the two stripes stay separated;
+#   * `lane/road curb` is off unless LANE_CURB_ENABLED=true.
+#
+# The regions between `# >>> GENERATED:<key>` and `# <<< GENERATED:<key>` are
+# produced by `tools/sync_taxonomy.py` from `taxonomy.yaml`. Do not edit them by
+# hand; run `python tools/sync_taxonomy.py --write` instead.
+metadata:
+  name: smart-lane
+  namespace: nuclio
+  labels:
+    nuclio.io/project-name: cvat
+  annotations:
+    # >>> GENERATED:model_title
+    name: "Smart Lane Marking (Polyline)"
+    # <<< GENERATED:model_title
+    type: detector
+    framework: custom
+    # >>> GENERATED:help_message
+    help_message: >-
+      Lane markings as polylines, produced by a CPU-only classical-CV detector
+      on a metric bird's-eye view of the road.
+    # <<< GENERATED:help_message
+    # >>> GENERATED:label_spec
+    spec: |
+      [
+        {"id":  0, "name": "lane/crosswalk",      "type": "polyline"},
+        {"id":  1, "name": "lane/double white",   "type": "polyline"},
+        {"id":  2, "name": "lane/double yellow",  "type": "polyline"},
+        {"id":  3, "name": "lane/road curb",      "type": "polyline"},
+        {"id":  4, "name": "lane/single other",   "type": "polyline"},
+        {"id":  5, "name": "lane/single white",   "type": "polyline"},
+        {"id":  6, "name": "lane/single yellow",  "type": "polyline"}
+      ]
+    # <<< GENERATED:label_spec
+
+spec:
+  # >>> GENERATED:description
+  description: >-
+    Lane-marking polylines from a CPU-only classical-CV detector. Scores the
+    road plane in metres via a bird's-eye view, so widths and gaps do not
+    drift with distance. No VRAM cost. Recall is limited: markings are traced
+    over roughly the bottom 40% of the frame, and lane/road curb is off by
+    default.
+  # <<< GENERATED:description
+  runtime: 'python:3.10'
+  handler: main:handler
+  eventTimeout: 180s
+
+  build:
+    image: cvat.smart.lane:latest
+    directives:
+      preCopy:
+        - kind: WORKDIR
+          value: /opt/nuclio
+        - kind: RUN
+          value: pip install --no-cache-dir numpy pillow opencv-python-headless requests
+
+  env:
+    - name: TASK
+      value: "lane"
+    - name: MODEL_SERVER_URL
+      value: "http://host.docker.internal:8001"
+    - name: MODEL_SERVER_TIMEOUT
+      value: "180"
+    # TAXONOMY_JSON is injected by `tools/deploy_nuclio.py` from taxonomy.yaml.
+    - name: LABEL_MAP
+      value: "{}"
+
+  triggers:
+    myHttpTrigger:
+      numWorkers: 1
+      kind: 'http'
+      workerAvailabilityTimeoutMilliseconds: 10000
+      attributes:
+        maxRequestBodySize: 67108864
+        # Fixed host port -- see section 3b in nuclio/README.md.
+        port: 9004
+
+  platform:
+    attributes:
+      network: cvat_cvat
+      mountMode: volume
+      restartPolicy:
+        name: always
+        maximumRetryCount: 3

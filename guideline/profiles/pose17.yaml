@@ -1,0 +1,105 @@
+# SINH TỰ ĐỘNG bởi `python tools/guidelines.py generate`.
+# Đừng sửa tay: sửa `taxonomy.yaml` (label) hoặc tài liệu nguồn, rồi sinh lại.
+# `status: pending` nghĩa là CHƯA có hiệu lực — xem `reasons`.
+task: pose17
+source: Week2_Guideline_HumanPose17_HocVien_v1.1.docx
+source_sha256: 98b33f2abf58be95b4ba0bdf62c30c90913776d73c2e3b17511e448d3ccc76a5
+status: applied
+generated_by: tools/guidelines.py generate (offline)
+reasons: []
+entries:
+- document_label: '1'
+  model_label: '1'
+  shape: skeleton
+  support: full
+  evidence: '| 1 | Nose | Chóp mũi. Mặt nghiêng vẫn là chóp mũi, không dời về giữa
+    mặt. |'
+- document_label: '2'
+  model_label: '2'
+  shape: skeleton
+  support: full
+  evidence: '| 2 | R Eye | Tâm đồng tử của mắt nằm phía PHẢI khung hình. Mắt nhắm
+    thì đặt ở tâm khe mí. |'
+- document_label: '3'
+  model_label: '3'
+  shape: skeleton
+  support: full
+  evidence: '| 3 | L Eye | Tâm đồng tử của mắt nằm phía TRÁI khung hình. Mắt nhắm
+    thì đặt ở tâm khe mí. |'
+- document_label: '4'
+  model_label: '4'
+  shape: skeleton
+  support: full
+  evidence: '| 4 | R Ear | Ống tai nằm phía PHẢI khung hình, không phải chóp vành
+    tai hay dái tai. |'
+- document_label: '5'
+  model_label: '5'
+  shape: skeleton
+  support: full
+  evidence: '| 5 | L Ear | Ống tai nằm phía TRÁI khung hình, không phải chóp vành
+    tai hay dái tai. |'
+- document_label: '6'
+  model_label: '6'
+  shape: skeleton
+  support: full
+  evidence: '| 6 | R Shoulder | Tâm khớp vai nằm phía PHẢI khung hình, tại điểm xoay
+    của cánh tay. |'
+- document_label: '7'
+  model_label: '7'
+  shape: skeleton
+  support: full
+  evidence: '| 7 | L Shoulder | Tâm khớp vai nằm phía TRÁI khung hình. |'
+- document_label: '8'
+  model_label: '8'
+  shape: skeleton
+  support: full
+  evidence: '| 8 | R Elbow | Tâm khớp khuỷu nằm phía PHẢI khung hình. |'
+- document_label: '9'
+  model_label: '9'
+  shape: skeleton
+  support: full
+  evidence: '| 9 | L Elbow | Tâm khớp khuỷu nằm phía TRÁI khung hình. |'
+- document_label: '10'
+  model_label: '10'
+  shape: skeleton
+  support: full
+  evidence: '| 10 | R Wrist | Tâm khớp cổ tay nằm phía PHẢI khung hình, ở nếp gấp
+    cổ tay. |'
+- document_label: '11'
+  model_label: '11'
+  shape: skeleton
+  support: full
+  evidence: '| 11 | L Wrist | Tâm khớp cổ tay nằm phía TRÁI khung hình. |'
+- document_label: '12'
+  model_label: '12'
+  shape: skeleton
+  support: full
+  evidence: '| 12 | R Hip | Tâm khớp háng nằm phía PHẢI khung hình, không phải mép
+    ngoài hông hay cạp quần. |'
+- document_label: '13'
+  model_label: '13'
+  shape: skeleton
+  support: full
+  evidence: '| 13 | L Hip | Tâm khớp háng nằm phía TRÁI khung hình. |'
+- document_label: '14'
+  model_label: '14'
+  shape: skeleton
+  support: full
+  evidence: '| 14 | R Knee | Tâm khớp gối nằm phía PHẢI khung hình, giữa xương bánh
+    chè. |'
+- document_label: '15'
+  model_label: '15'
+  shape: skeleton
+  support: full
+  evidence: '| 15 | L Knee | Tâm khớp gối nằm phía TRÁI khung hình. |'
+- document_label: '16'
+  model_label: '16'
+  shape: skeleton
+  support: full
+  evidence: '| 16 | R Ankle | Tâm khớp cổ chân nằm phía PHẢI khung hình, ngang mắt
+    cá. |'
+- document_label: '17'
+  model_label: '17'
+  shape: skeleton
+  support: full
+  evidence: '| 17 | L Ankle | Tâm khớp cổ chân nằm phía TRÁI khung hình. |'

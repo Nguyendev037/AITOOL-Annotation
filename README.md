@@ -202,8 +202,16 @@ cvat-browser-agent_v2/
 │   └── build/              # Payload JSON sinh ra (gitignored)
 ├── sam-service/checkpoints/ # SAM2 checkpoint (898 MB, gitignored)
 ├── cvat-model-integrator/   # Skill tích hợp model vào CVAT
-├── guildlline/              # PDF guideline gốc (BBox + Semantic)
-├── guideline/               # Markdown guideline đã chuẩn hóa
+├── guildlline/              # PDF/DOCX guideline gốc (BBox + Semantic + Week2 Face/Pose)
+├── guideline/               # Markdown guideline đã chuẩn hóa + generated/
+├── rules/                   # ⭐ LUẬT annotation dạng dữ liệu (sửa ở đây để đổi hành vi)
+├── browser_agent/           # ⭐ Lõi browser-agent: browser-use, vision, CVAT REST
+│   ├── vision/             #   pipeline map landmark, worker MediaPipe/FaceMesh, rules.py
+│   ├── cdp_ws.py           #   WebSocket tự viết (không cần gói ngoài)
+│   └── geometry.py         #   Thứ tự điểm theo guideline (VF-50, pose-17)
+├── ai/doc/                  # ⭐ Tài liệu hạng mục browser-agent
+│   ├── TIEN-DO-BROWSER-AGENT.md      # Nhật ký kỹ thuật + bằng chứng
+│   └── HUONG-DAN-BROWSER-AGENT.md    # Hướng dẫn sử dụng
 ├── train/                   # Dataset train (1354 = bbox, 1571 = segmentation)
 ├── test/detect/             # Ảnh test (25 ảnh)
 ├── results/                 # Kết quả batch test (gitignored)
@@ -222,7 +230,7 @@ Copy `.env.example` thành `.env` rồi chỉnh:
 
 | Biến                | Mặc định                                      | Mục đích                             |
 | ------------------- | --------------------------------------------- | ------------------------------------ |
-| `YOLO26_MODEL`      | `yolo26m.pt`                                  | Weights YOLO26                       |
+| `YOLO26_MODEL`      | `/weights/yolo26m.pt`                         | Weights YOLO26 (bind-mount read-only) |
 | `YOLO26_CONF`       | `0.25`                                        | Ngưỡng confidence detection          |
 | `YOLO26_IOU`        | `0.45`                                        | Ngưỡng NMS IoU                       |
 | `SEMANTIC_BACKEND`  | `eomt`                                        | `segformer` / `mask2former` / `eomt` |
@@ -240,11 +248,12 @@ Copy `.env.example` thành `.env` rồi chỉnh:
 | `docker ps` báo permission denied             | Mở Docker Desktop, đảm bảo daemon chạy (service vẫn có thể phục vụ HTTP) |
 | `/health` `cuda_available: false`             | Docker có GPU, `capabilities: [gpu]`, NVIDIA runtime                     |
 | `checkpoint_exists: false`                    | Đảm bảo `sam-service/checkpoints/sam2.1_hiera_large.pt` tồn tại          |
-| `/detect` lần đầu chậm                        | Đang tải `yolo26m.pt` lần đầu; các lần sau ~30-120 ms                    |
+| `/detect` treo > 1 phút, MỌI endpoint đều treo | Thiếu `model-service/weights/yolo26m.pt` → ultralytics tải 42 MB từ GitHub (~26 KB/s) và chặn event loop. Xem `docker logs cvat-smart-model` |
+| `/detect` các lần sau                         | ~30-120 ms (model đã nạp vào VRAM)                                       |
 | `/segment-drivable` lần đầu chậm              | Đang tải EoMT-DINOv3 vào VRAM lần đầu (~vài GB)                          |
 | `/segment-drivable` không có lane             | Đúng giới hạn COCO — xem mục "Drivable area & lane marking"              |
 | Chạy auto-annotation ra 0 shape               | `python tools/cvat_labels.py check --task <id> --verbose` — tên label task không khớp model |
-| YOLO26 không tải được                         | Kiểm tra mạng khi build (tải weights), volume `model-ultralytics`        |
+| YOLO26 không tải được                         | `model-service/weights/yolo26m.pt` phải tồn tại trên host; mount read-only tại `/weights` |
 
 ---
 

@@ -6,6 +6,7 @@ which model-service endpoint is called and which CVAT geometry is produced:
     TASK=bbox       POST /detect             -> type "rectangle"
     TASK=semantic   POST /segment-semantic   -> type "polygon" (mask -> contours)
     TASK=drivable   POST /segment-drivable   -> type "polygon" (polygons ready)
+    TASK=lane       POST /segment-lane       -> type "polyline" (ordered points)
 
 All heavy models (YOLO26, EoMT, SAM2) live in the ``cvat-smart-model`` sidecar
 container which owns the GPU. This function is a CPU-only proxy plus a geometry
@@ -46,6 +47,7 @@ TASK_ENDPOINTS = {
     "bbox": "/detect",
     "semantic": "/segment-semantic",
     "drivable": "/segment-drivable",
+    "lane": "/segment-lane",
 }
 
 # Task-specific label taxonomy, injected by `tools/deploy_nuclio.py` straight
@@ -265,10 +267,45 @@ def _drivable_annotations(payload: dict, context, threshold: float | None) -> li
     return annotations
 
 
+def _lane_annotations(payload: dict, context, threshold: float | None) -> list[dict]:
+    """Lane markings as CVAT polylines.
+
+    CVAT's engine validator has a dedicated branch for this shape
+    (``cvat/apps/engine/serializers.py``): a polyline needs an even number of
+    coordinates and at least four of them, i.e. two points. ``points`` is a
+    *flat* ``[x0, y0, x1, y1, ...]`` list, not a list of pairs -- getting that
+    wrong is the classic way to make auto-annotation silently return nothing.
+
+    There is no mask-to-polyline conversion here on purpose: the model-service
+    already returns ordered centreline points, because tracing a skeleton is
+    cheaper and more accurate than contouring a mask.
+    """
+    annotations: list[dict] = []
+    dropped = 0
+    for lane in payload.get("lanes", []):
+        points = [round(float(v), 2) for v in lane.get("points", [])]
+        if len(points) < 4 or len(points) % 2:
+            dropped += 1
+            continue
+        confidence = float(lane.get("confidence", 0.0))
+        if threshold is not None and confidence < threshold:
+            continue
+        annotations.append({
+            "confidence": f"{confidence:.4f}",
+            "label": lane["label"],
+            "points": points,
+            "type": "polyline",
+        })
+    if dropped:
+        context.logger.warning("lane: dropped %d malformed polyline(s)", dropped)
+    return annotations
+
+
 _BUILDERS = {
     "bbox": _bbox_annotations,
     "semantic": _semantic_annotations,
     "drivable": _drivable_annotations,
+    "lane": _lane_annotations,
 }
 
 

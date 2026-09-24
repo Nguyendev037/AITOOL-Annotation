@@ -1,0 +1,105 @@
+# SINH TỰ ĐỘNG bởi `python tools/guidelines.py generate`.
+# Đừng sửa tay: sửa `taxonomy.yaml` (label) hoặc tài liệu nguồn, rồi sinh lại.
+# `status: pending` nghĩa là CHƯA có hiệu lực — xem `reasons`.
+task: semantic
+source: Semantic_Segmentation_Annotation_Guideline.pdf
+source_sha256: 8d8d1dc910b2a136799e9d94469d4bbc7f8e59bf4c036f0835add38a5ca2698d
+status: applied
+generated_by: tools/guidelines.py generate (offline)
+reasons: []
+entries:
+- document_label: road
+  model_label: road
+  shape: polygon
+  support: full
+  evidence: 'road #804080 128, 64, 128'
+- document_label: sidewalk
+  model_label: sidewalk
+  shape: polygon
+  support: full
+  evidence: 'sidewalk #F423E8 244, 35, 232'
+- document_label: building
+  model_label: building
+  shape: polygon
+  support: full
+  evidence: 'building #464646 70, 70, 70'
+- document_label: wall
+  model_label: wall
+  shape: polygon
+  support: full
+  evidence: 'wall #66669C 102, 102, 156'
+- document_label: fence
+  model_label: fence
+  shape: polygon
+  support: full
+  evidence: 'fence #BE9999 190, 153, 153'
+- document_label: pole
+  model_label: pole
+  shape: polygon
+  support: full
+  evidence: 'pole #999999 153, 153, 153'
+- document_label: traffic_light
+  model_label: traffic_light
+  shape: polygon
+  support: full
+  evidence: 'traffic_light #FAAA1E 250, 170, 30'
+- document_label: traffic_sign
+  model_label: traffic_sign
+  shape: polygon
+  support: full
+  evidence: 'traffic_sign #DCDC00 220, 220, 0'
+- document_label: vegetation
+  model_label: vegetation
+  shape: polygon
+  support: full
+  evidence: 'vegetation #6B8E23 107, 142, 35'
+- document_label: terrain
+  model_label: terrain
+  shape: polygon
+  support: full
+  evidence: 'terrain #98FB98 152, 251, 152'
+- document_label: sky
+  model_label: sky
+  shape: polygon
+  support: full
+  evidence: 'sky #4682B4 70, 130, 180'
+- document_label: person
+  model_label: person
+  shape: polygon
+  support: full
+  evidence: 'person #DC143C 220, 20, 60'
+- document_label: rider
+  model_label: rider
+  shape: polygon
+  support: full
+  evidence: 'rider #FF0000 255, 0, 0'
+- document_label: car
+  model_label: car
+  shape: polygon
+  support: full
+  evidence: 'car #00008E 0, 0, 142'
+- document_label: truck
+  model_label: truck
+  shape: polygon
+  support: full
+  evidence: 'truck #000046 0, 0, 70'
+- document_label: bus
+  model_label: bus
+  shape: polygon
+  support: full
+  evidence: 'bus #003C64 0, 60, 100'
+- document_label: train
+  model_label: train
+  shape: polygon
+  support: full
+  evidence: 'train #005064 0, 80, 100'
+- document_label: motorcycle
+  model_label: motorcycle
+  shape: polygon
+  support: full
+  evidence: 'motorcycle #0000E6 0, 0, 230'
+- document_label: bicycle
+  model_label: bicycle
+  shape: polygon
+  support: full
+  evidence: 'bicycle #770B20 119, 11, 32'

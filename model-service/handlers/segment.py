@@ -38,7 +38,6 @@ if not TAXONOMY_PATH.is_file():
     )
 TAXONOMY = json.loads(TAXONOMY_PATH.read_text(encoding="utf-8"))
 DRIVABLE_TASK = TAXONOMY["tasks"]["drivable"]
-LANE_GROUP = TAXONOMY["unsupported"]["lane"]
 
 
 def _normalize_label(label: str) -> str:
@@ -390,13 +389,6 @@ def run_drivable_segmentation(rgb: np.ndarray) -> dict[str, Any]:
         "backend": backend,
         "raw_segment_count": raw_segments,
         "drivable": drivable,
-        "lane_marking": {
-            # Declared by the guideline but not producible by any deployed
-            # model; the taxonomy carries the reason so it cannot drift.
-            "supported": False,
-            "labels": LANE_GROUP["labels"],
-            "reason": LANE_GROUP["reason"],
-        },
         "memory": {
             "allocated_bytes": allocated,
             "max_allocated_bytes": max_allocated,

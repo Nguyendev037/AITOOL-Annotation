@@ -158,33 +158,68 @@
       "id": "lane",
       "title": "Lane marking",
       "shape": "polyline",
-      "task": null,
-      "function": null,
+      "task": "lane",
+      "function": "smart-lane",
       "labels": [
         {
-          "name": "lane/crosswalk"
+          "name": "lane/crosswalk",
+          "color": [
+            0,
+            220,
+            220
+          ]
         },
         {
-          "name": "lane/double white"
+          "name": "lane/double white",
+          "color": [
+            255,
+            255,
+            255
+          ]
         },
         {
-          "name": "lane/double yellow"
+          "name": "lane/double yellow",
+          "color": [
+            255,
+            215,
+            0
+          ]
         },
         {
-          "name": "lane/road curb"
+          "name": "lane/road curb",
+          "color": [
+            255,
+            0,
+            255
+          ],
+          "note": "Mặc định tắt (LANE_CURB_ENABLED=false). Curb là biên độ sâu chứ không phải vạch sáng; detector gradient cho quá nhiều false positive."
         },
         {
-          "name": "lane/single other"
+          "name": "lane/single other",
+          "color": [
+            150,
+            150,
+            255
+          ],
+          "note": "Vạch không phân loại được là trắng hay vàng (colour vote không đạt ngưỡng), hoặc vạch đôi màu không xác định."
         },
         {
-          "name": "lane/single white"
+          "name": "lane/single white",
+          "color": [
+            0,
+            255,
+            0
+          ]
         },
         {
-          "name": "lane/single yellow"
+          "name": "lane/single yellow",
+          "color": [
+            255,
+            140,
+            0
+          ]
         }
-      ],
-      "supported": false,
-      "unsupported_reason": "COCO panoptic has no `lane/*` class and the training sets contain zero lane annotations, so no deployed model can produce polyline lane marking."
+      ]
     },
     {
       "id": "semantic",
@@ -318,6 +353,239 @@
           ]
         }
       ]
+    },
+    {
+      "id": "pose17",
+      "title": "HumanPose-17",
+      "shape": "skeleton",
+      "task": "pose17",
+      "function": null,
+      "labels": [
+        {
+          "name": "1"
+        },
+        {
+          "name": "2"
+        },
+        {
+          "name": "3"
+        },
+        {
+          "name": "4"
+        },
+        {
+          "name": "5"
+        },
+        {
+          "name": "6"
+        },
+        {
+          "name": "7"
+        },
+        {
+          "name": "8"
+        },
+        {
+          "name": "9"
+        },
+        {
+          "name": "10"
+        },
+        {
+          "name": "11"
+        },
+        {
+          "name": "12"
+        },
+        {
+          "name": "13"
+        },
+        {
+          "name": "14"
+        },
+        {
+          "name": "15"
+        },
+        {
+          "name": "16"
+        },
+        {
+          "name": "17"
+        }
+      ]
+    },
+    {
+      "id": "face50",
+      "title": "Face Landmark VF-50",
+      "shape": "skeleton",
+      "task": "face50",
+      "function": null,
+      "labels": [
+        {
+          "name": "0"
+        },
+        {
+          "name": "1"
+        },
+        {
+          "name": "2"
+        },
+        {
+          "name": "3"
+        },
+        {
+          "name": "4"
+        },
+        {
+          "name": "5"
+        },
+        {
+          "name": "6"
+        },
+        {
+          "name": "7"
+        },
+        {
+          "name": "8"
+        },
+        {
+          "name": "9"
+        },
+        {
+          "name": "10"
+        },
+        {
+          "name": "11"
+        },
+        {
+          "name": "12"
+        },
+        {
+          "name": "13"
+        },
+        {
+          "name": "14"
+        },
+        {
+          "name": "15"
+        },
+        {
+          "name": "16"
+        },
+        {
+          "name": "17"
+        },
+        {
+          "name": "18"
+        },
+        {
+          "name": "19"
+        },
+        {
+          "name": "20"
+        },
+        {
+          "name": "21"
+        },
+        {
+          "name": "22"
+        },
+        {
+          "name": "23"
+        },
+        {
+          "name": "24"
+        },
+        {
+          "name": "25"
+        },
+        {
+          "name": "26"
+        },
+        {
+          "name": "27"
+        },
+        {
+          "name": "28"
+        },
+        {
+          "name": "29"
+        },
+        {
+          "name": "30"
+        },
+        {
+          "name": "31"
+        },
+        {
+          "name": "32"
+        },
+        {
+          "name": "33"
+        },
+        {
+          "name": "34"
+        },
+        {
+          "name": "35"
+        },
+        {
+          "name": "36"
+        },
+        {
+          "name": "37"
+        },
+        {
+          "name": "38"
+        },
+        {
+          "name": "39"
+        },
+        {
+          "name": "40"
+        },
+        {
+          "name": "41"
+        },
+        {
+          "name": "42"
+        },
+        {
+          "name": "43"
+        },
+        {
+          "name": "44"
+        },
+        {
+          "name": "45"
+        },
+        {
+          "name": "46"
+        },
+        {
+          "name": "47"
+        },
+        {
+          "name": "48"
+        },
+        {
+          "name": "49"
+        }
+      ]
+    },
+    {
+      "id": "lidar3d",
+      "title": "LiDAR 3D cuboid",
+      "shape": "cuboid_3d",
+      "task": "lidar3d",
+      "function": null,
+      "labels": [
+        {
+          "name": "Object3D"
+        }
+      ],
+      "supported": false,
+      "unsupported_reason": "Chưa có model 3D đã kiểm chứng. LiDAR v1 chỉ fit cuboid hình học từ vùng điểm người dùng chọn và không tự nhận diện lớp vật thể."
     }
   ],
   "tasks": {
@@ -430,6 +698,60 @@
         ]
       }
     },
+    "lane": {
+      "group": "lane",
+      "shape": "polyline",
+      "model_title": "Smart Lane Marking (Polyline)",
+      "help_message": "Lane markings as polylines, produced by a CPU-only classical-CV detector on a metric bird's-eye view of the road.",
+      "description": "Lane-marking polylines from a CPU-only classical-CV detector. Scores the road plane in metres via a bird's-eye view, so widths and gaps do not drift with distance. No VRAM cost. Recall is limited: markings are traced over roughly the bottom 40% of the frame, and lane/road curb is off by default.",
+      "declared": [
+        "lane/crosswalk",
+        "lane/double white",
+        "lane/double yellow",
+        "lane/road curb",
+        "lane/single other",
+        "lane/single white",
+        "lane/single yellow"
+      ],
+      "coco_map": {},
+      "colors": {
+        "lane/crosswalk": [
+          0,
+          220,
+          220
+        ],
+        "lane/double white": [
+          255,
+          255,
+          255
+        ],
+        "lane/double yellow": [
+          255,
+          215,
+          0
+        ],
+        "lane/road curb": [
+          255,
+          0,
+          255
+        ],
+        "lane/single other": [
+          150,
+          150,
+          255
+        ],
+        "lane/single white": [
+          0,
+          255,
+          0
+        ],
+        "lane/single yellow": [
+          255,
+          140,
+          0
+        ]
+      }
+    },
     "semantic": {
       "group": "semantic",
       "shape": "polygon",
@@ -490,21 +812,116 @@
         "bicycle": "bicycle"
       },
       "colors": {}
+    },
+    "pose17": {
+      "group": "pose17",
+      "shape": "skeleton",
+      "model_title": "Smart HumanPose-17 (MediaPipe)",
+      "help_message": "Skeleton 17 điểm theo guideline HumanPose-17, chạy tại chỗ bằng MediaPipe.",
+      "description": "HumanPose-17 qua MediaPipe Pose, chạy trong tiến trình browser-agent nên không tốn VRAM và không có nuclio function. Trái/phải được chọn theo toạ độ từng ảnh (quyết định B), không theo nhãn giải phẫu của model.",
+      "declared": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17"
+      ],
+      "coco_map": {},
+      "colors": {}
+    },
+    "face50": {
+      "group": "face50",
+      "shape": "skeleton",
+      "model_title": "Smart Face Landmark VF-50 (MediaPipe)",
+      "help_message": "Skeleton 50 điểm theo guideline Face Landmark VF-50, chạy tại chỗ bằng MediaPipe.",
+      "description": "Face Landmark VF-50 qua MediaPipe FaceMesh (468 đỉnh, dùng 50 điểm theo guideline). Chạy trong tiến trình browser-agent. 7 nhóm con (lông mày, mắt, sống mũi, môi) nằm trong `browser_agent/geometry.FACE_SKELETONS`.",
+      "declared": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "31",
+        "32",
+        "33",
+        "34",
+        "35",
+        "36",
+        "37",
+        "38",
+        "39",
+        "40",
+        "41",
+        "42",
+        "43",
+        "44",
+        "45",
+        "46",
+        "47",
+        "48",
+        "49"
+      ],
+      "coco_map": {},
+      "colors": {}
+    },
+    "lidar3d": {
+      "group": "lidar3d",
+      "shape": "cuboid_3d",
+      "model_title": null,
+      "help_message": null,
+      "description": null,
+      "declared": [
+        "Object3D"
+      ],
+      "coco_map": {},
+      "colors": {}
     }
   },
   "unsupported": {
-    "lane": {
+    "lidar3d": {
       "labels": [
-        "lane/crosswalk",
-        "lane/double white",
-        "lane/double yellow",
-        "lane/road curb",
-        "lane/single other",
-        "lane/single white",
-        "lane/single yellow"
+        "Object3D"
       ],
-      "shape": "polyline",
-      "reason": "COCO panoptic has no `lane/*` class and the training sets contain zero lane annotations, so no deployed model can produce polyline lane marking."
+      "shape": "cuboid_3d",
+      "reason": "Chưa có model 3D đã kiểm chứng. LiDAR v1 chỉ fit cuboid hình học từ vùng điểm người dùng chọn và không tự nhận diện lớp vật thể."
     }
   }
 }

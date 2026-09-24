@@ -1,0 +1,30 @@
+{
+  "combined_sha256": "117106c989a48b990b9ab393584158001ece65efa52e7d53aa3a91d1095a2c68",
+  "outputs": {
+    "*": "guideline/generated/guidelines.md",
+    "Annotation_Guideline_BBox_Polygon_Polyline.pdf": "guideline/generated/annotation-guideline-bbox-polygon-polyline.md",
+    "Semantic_Segmentation_Annotation_Guideline.pdf": "guideline/generated/semantic-segmentation-annotation-guideline.md",
+    "Week2_Guideline_Face_Landmark_VF50_HocVien_v1.3.docx": "guideline/generated/week2-guideline-face-landmark-vf50-hocvien-v1-3.md",
+    "Week2_Guideline_HumanPose17_HocVien_v1.1.docx": "guideline/generated/week2-guideline-humanpose17-hocvien-v1-1.md"
+  },
+  "sources": {
+    "Annotation_Guideline_BBox_Polygon_Polyline.pdf": {
+      "sha256": "63bce09da0e85b8803f2809fc7a90150663d6dd6d24984ec4d264efbf3711d61",
+      "size": 167723
+    },
+    "Semantic_Segmentation_Annotation_Guideline.pdf": {
+      "sha256": "8d8d1dc910b2a136799e9d94469d4bbc7f8e59bf4c036f0835add38a5ca2698d",
+      "size": 203043
+    },
+    "Week2_Guideline_Face_Landmark_VF50_HocVien_v1.3.docx": {
+      "sha256": "ac1e0e342e2d84579cb4318f529d732b4e77275184342c97edda4c5d32ba42c8",
+      "size": 3849351
+    },
+    "Week2_Guideline_HumanPose17_HocVien_v1.1.docx": {
+      "sha256": "98b33f2abf58be95b4ba0bdf62c30c90913776d73c2e3b17511e448d3ccc76a5",
+      "size": 2648357
+    }
+  },
+  "synced_at": "2026-09-23T14:27:30+0700",
+  "version": 1
+}

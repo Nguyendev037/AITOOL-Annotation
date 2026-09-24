@@ -1,0 +1,279 @@
+# SINH TỰ ĐỘNG bởi `python tools/guidelines.py generate`.
+# Đừng sửa tay: sửa `taxonomy.yaml` (label) hoặc tài liệu nguồn, rồi sinh lại.
+# `status: pending` nghĩa là CHƯA có hiệu lực — xem `reasons`.
+task: face50
+source: Week2_Guideline_Face_Landmark_VF50_HocVien_v1.3.docx
+source_sha256: ac1e0e342e2d84579cb4318f529d732b4e77275184342c97edda4c5d32ba42c8
+status: applied
+generated_by: tools/guidelines.py generate (offline)
+reasons: []
+entries:
+- document_label: '0'
+  model_label: '0'
+  shape: skeleton
+  support: full
+  evidence: '| 0 | Đuôi ngoài, nơi lông mày thon lại về phía thái dương. Điểm này
+    thấp và lệch ra ngoài so với điểm 1 | 0,00 |'
+- document_label: '1'
+  model_label: '1'
+  shape: skeleton
+  support: full
+  evidence: '| 1 | Bờ trên, đoạn ngoài | 0,15 |'
+- document_label: '2'
+  model_label: '2'
+  shape: skeleton
+  support: full
+  evidence: '| 2 | Bờ trên, đoạn giữa-ngoài | 0,41 |'
+- document_label: '3'
+  model_label: '3'
+  shape: skeleton
+  support: full
+  evidence: '| 3 | Bờ trên, đoạn giữa-trong, thường gần đỉnh cung | 0,73 |'
+- document_label: '4'
+  model_label: '4'
+  shape: skeleton
+  support: full
+  evidence: '| 4 | Đầu trong, gần sống mũi nhất | 1,00 |'
+- document_label: '5'
+  model_label: '5'
+  shape: skeleton
+  support: full
+  evidence: '| 5 | Đầu trong, gần sống mũi | 0,00 |'
+- document_label: '6'
+  model_label: '6'
+  shape: skeleton
+  support: full
+  evidence: '| 6 | Bờ trên, đoạn giữa-trong | 0,26 |'
+- document_label: '7'
+  model_label: '7'
+  shape: skeleton
+  support: full
+  evidence: '| 7 | Bờ trên, đoạn giữa, thường gần đỉnh cung | 0,58 |'
+- document_label: '8'
+  model_label: '8'
+  shape: skeleton
+  support: full
+  evidence: '| 8 | Bờ trên, đoạn ngoài | 0,85 |'
+- document_label: '9'
+  model_label: '9'
+  shape: skeleton
+  support: full
+  evidence: '| 9 | Đuôi ngoài | 1,00 |'
+- document_label: '10'
+  model_label: '10'
+  shape: skeleton
+  support: full
+  evidence: '| 10 | Đỉnh sống mũi, điểm lõm giữa hai mắt, ngang tầm khoé mắt trong
+    | 0,00 |'
+- document_label: '11'
+  model_label: '11'
+  shape: skeleton
+  support: full
+  evidence: '| 11 | Một phần ba trên sống mũi | 0,34 |'
+- document_label: '12'
+  model_label: '12'
+  shape: skeleton
+  support: full
+  evidence: '| 12 | Hai phần ba sống mũi | 0,67 |'
+- document_label: '13'
+  model_label: '13'
+  shape: skeleton
+  support: full
+  evidence: '| 13 | Chân sống mũi, nơi sống mũi kết thúc và đầu mũi bắt đầu nhô ra
+    | 1,00 |'
+- document_label: '14'
+  model_label: '14'
+  shape: skeleton
+  support: full
+  evidence: '| 14 | Khoé mắt ngoài, phía thái dương | 0,00 |'
+- document_label: '15'
+  model_label: '15'
+  shape: skeleton
+  support: full
+  evidence: '| 15 | Mí trên, một phần tư ngoài | 0,21 |'
+- document_label: '16'
+  model_label: '16'
+  shape: skeleton
+  support: full
+  evidence: '| 16 | Mí trên, giữa, điểm cao nhất | 0,48 |'
+- document_label: '17'
+  model_label: '17'
+  shape: skeleton
+  support: full
+  evidence: '| 17 | Mí trên, một phần tư trong | 0,76 |'
+- document_label: '18'
+  model_label: '18'
+  shape: skeleton
+  support: full
+  evidence: '| 18 | Khoé mắt trong, phía mũi | 1,00 |'
+- document_label: '19'
+  model_label: '19'
+  shape: skeleton
+  support: full
+  evidence: '| 19 | Mí dưới, một phần tư trong | 0,76 |'
+- document_label: '20'
+  model_label: '20'
+  shape: skeleton
+  support: full
+  evidence: '| 20 | Mí dưới, giữa, điểm thấp nhất | 0,50 |'
+- document_label: '21'
+  model_label: '21'
+  shape: skeleton
+  support: full
+  evidence: '| 21 | Mí dưới, một phần tư ngoài | 0,24 |'
+- document_label: '22'
+  model_label: '22'
+  shape: skeleton
+  support: full
+  evidence: '| 22 | Khoé mắt trong, phía mũi | 0,00 |'
+- document_label: '23'
+  model_label: '23'
+  shape: skeleton
+  support: full
+  evidence: '| 23 | Mí trên, một phần tư trong | 0,23 |'
+- document_label: '24'
+  model_label: '24'
+  shape: skeleton
+  support: full
+  evidence: '| 24 | Mí trên, giữa | 0,51 |'
+- document_label: '25'
+  model_label: '25'
+  shape: skeleton
+  support: full
+  evidence: '| 25 | Mí trên, một phần tư ngoài | 0,79 |'
+- document_label: '26'
+  model_label: '26'
+  shape: skeleton
+  support: full
+  evidence: '| 26 | Khoé mắt ngoài, phía thái dương | 1,00 |'
+- document_label: '27'
+  model_label: '27'
+  shape: skeleton
+  support: full
+  evidence: '| 27 | Mí dưới, một phần tư ngoài | 0,78 |'
+- document_label: '28'
+  model_label: '28'
+  shape: skeleton
+  support: full
+  evidence: '| 28 | Mí dưới, giữa | 0,52 |'
+- document_label: '29'
+  model_label: '29'
+  shape: skeleton
+  support: full
+  evidence: '| 29 | Mí dưới, một phần tư trong | 0,25 |'
+- document_label: '30'
+  model_label: '30'
+  shape: skeleton
+  support: full
+  evidence: '| 30 | Khoé miệng trái | 0,00 |'
+- document_label: '31'
+  model_label: '31'
+  shape: skeleton
+  support: full
+  evidence: '| 31 – 35 | Bờ môi trên, từ khoé trái sang khoé phải | 0,18 · 0,41 ·
+    0,53 · 0,65 · 0,85 |  (điểm 31 nằm trong khoảng 31–35 của nhóm này)'
+- document_label: '32'
+  model_label: '32'
+  shape: skeleton
+  support: full
+  evidence: '| 31 – 35 | Bờ môi trên, từ khoé trái sang khoé phải | 0,18 · 0,41 ·
+    0,53 · 0,65 · 0,85 |  (điểm 32 nằm trong khoảng 31–35 của nhóm này)'
+- document_label: '33'
+  model_label: '33'
+  shape: skeleton
+  support: full
+  evidence: '| 31 – 35 | Bờ môi trên, từ khoé trái sang khoé phải | 0,18 · 0,41 ·
+    0,53 · 0,65 · 0,85 |  (điểm 33 nằm trong khoảng 31–35 của nhóm này)'
+- document_label: '34'
+  model_label: '34'
+  shape: skeleton
+  support: full
+  evidence: '| 31 – 35 | Bờ môi trên, từ khoé trái sang khoé phải | 0,18 · 0,41 ·
+    0,53 · 0,65 · 0,85 |  (điểm 34 nằm trong khoảng 31–35 của nhóm này)'
+- document_label: '35'
+  model_label: '35'
+  shape: skeleton
+  support: full
+  evidence: '| 31 – 35 | Bờ môi trên, từ khoé trái sang khoé phải | 0,18 · 0,41 ·
+    0,53 · 0,65 · 0,85 |  (điểm 35 nằm trong khoảng 31–35 của nhóm này)'
+- document_label: '36'
+  model_label: '36'
+  shape: skeleton
+  support: full
+  evidence: '| 36 | Khoé miệng phải | 1,00 |'
+- document_label: '37'
+  model_label: '37'
+  shape: skeleton
+  support: full
+  evidence: '| 37 – 41 | Bờ môi dưới, từ khoé phải về khoé trái | 0,87 · 0,72 · 0,55
+    · 0,35 · 0,18 |  (điểm 37 nằm trong khoảng 37–41 của nhóm này)'
+- document_label: '38'
+  model_label: '38'
+  shape: skeleton
+  support: full
+  evidence: '| 37 – 41 | Bờ môi dưới, từ khoé phải về khoé trái | 0,87 · 0,72 · 0,55
+    · 0,35 · 0,18 |  (điểm 38 nằm trong khoảng 37–41 của nhóm này)'
+- document_label: '39'
+  model_label: '39'
+  shape: skeleton
+  support: full
+  evidence: '| 37 – 41 | Bờ môi dưới, từ khoé phải về khoé trái | 0,87 · 0,72 · 0,55
+    · 0,35 · 0,18 |  (điểm 39 nằm trong khoảng 37–41 của nhóm này)'
+- document_label: '40'
+  model_label: '40'
+  shape: skeleton
+  support: full
+  evidence: '| 37 – 41 | Bờ môi dưới, từ khoé phải về khoé trái | 0,87 · 0,72 · 0,55
+    · 0,35 · 0,18 |  (điểm 40 nằm trong khoảng 37–41 của nhóm này)'
+- document_label: '41'
+  model_label: '41'
+  shape: skeleton
+  support: full
+  evidence: '| 37 – 41 | Bờ môi dưới, từ khoé phải về khoé trái | 0,87 · 0,72 · 0,55
+    · 0,35 · 0,18 |  (điểm 41 nằm trong khoảng 37–41 của nhóm này)'
+- document_label: '42'
+  model_label: '42'
+  shape: skeleton
+  support: full
+  evidence: '| 42 | Khoé trong trái | 0,00 |'
+- document_label: '43'
+  model_label: '43'
+  shape: skeleton
+  support: full
+  evidence: '| 43 – 45 | Mép trong môi trên | 0,22 · 0,53 · 0,82 |  (điểm 43 nằm trong
+    khoảng 43–45 của nhóm này)'
+- document_label: '44'
+  model_label: '44'
+  shape: skeleton
+  support: full
+  evidence: '| 43 – 45 | Mép trong môi trên | 0,22 · 0,53 · 0,82 |  (điểm 44 nằm trong
+    khoảng 43–45 của nhóm này)'
+- document_label: '45'
+  model_label: '45'
+  shape: skeleton
+  support: full
+  evidence: '| 43 – 45 | Mép trong môi trên | 0,22 · 0,53 · 0,82 |  (điểm 45 nằm trong
+    khoảng 43–45 của nhóm này)'
+- document_label: '46'
+  model_label: '46'
+  shape: skeleton
+  support: full
+  evidence: '| 46 | Khoé trong phải | 1,00 |'
+- document_label: '47'
+  model_label: '47'
+  shape: skeleton
+  support: full
+  evidence: '| 47 – 49 | Mép trong môi dưới | 0,81 · 0,53 · 0,23 |  (điểm 47 nằm trong
+    khoảng 47–49 của nhóm này)'
+- document_label: '48'
+  model_label: '48'
+  shape: skeleton
+  support: full
+  evidence: '| 47 – 49 | Mép trong môi dưới | 0,81 · 0,53 · 0,23 |  (điểm 48 nằm trong
+    khoảng 47–49 của nhóm này)'
+- document_label: '49'
+  model_label: '49'
+  shape: skeleton
+  support: full
+  evidence: '| 47 – 49 | Mép trong môi dưới | 0,81 · 0,53 · 0,23 |  (điểm 49 nằm trong
+    khoảng 47–49 của nhóm này)'

@@ -5,8 +5,6 @@
 # before starting (gitignored; not committed). The service exposes port
 # 8001 on the host for Nuclio adapters and batch runners to reach.
 
-version: "3.8"
-
 services:
   model-service:
     build:
@@ -19,11 +17,21 @@ services:
       - "8001:8000"
     volumes:
       - ./sam-service/checkpoints:/models:ro
+      # YOLO26 weights are bind-mounted read-only for exactly the same reason the
+      # SAM2 checkpoint is: they must survive `docker compose up -d` recreating
+      # the container. They are NOT cached by `model-ultralytics` --
+      # YOLO_CONFIG_DIR only relocates ultralytics' *config* dir, and a bare
+      # relative weight name resolves against WORKDIR (/opt/service), i.e. the
+      # ephemeral writable layer. That made every recreate re-download 42 MB
+      # from GitHub at ~26 KB/s with the service wedged for ~27 minutes.
+      - ./model-service/weights:/weights:ro
       - model-hf-cache:/opt/hf-cache
       - model-ultralytics:/opt/ultralytics
     environment:
       - SAM2_DEVICE=cuda
-      - YOLO26_MODEL=${YOLO26_MODEL:-yolo26m.pt}
+      # Absolute path on purpose: a bare `yolo26m.pt` silently triggers a
+      # runtime GitHub download (see the volumes comment above).
+      - YOLO26_MODEL=${YOLO26_MODEL:-/weights/yolo26m.pt}
       - YOLO26_CONF=${YOLO26_CONF:-0.25}
       - YOLO26_IOU=${YOLO26_IOU:-0.45}
       - YOLO_CONFIG_DIR=/opt/ultralytics
@@ -36,6 +44,15 @@ services:
       - ENHANCE_ENABLED=${ENHANCE_ENABLED:-true}
       - ENHANCE_DARK_REGIONS=${ENHANCE_DARK_REGIONS:-true}
       - ENHANCE_MOTION_BLUR=${ENHANCE_MOTION_BLUR:-false}
+      # Lane marking (Polyline). CPU-only by design: it must never take VRAM
+      # from the GPU-resident YOLO26 / EoMT / SAM2 models. LANE_MAX_DEPTH_M
+      # caps how far ahead markings are traced -- raising it widens coverage
+      # but the bird raster then upsamples horizon noise into fake markings.
+      - LANE_MAX_DEPTH_M=${LANE_MAX_DEPTH_M:-12.0}
+      - LANE_BIRD_PPM=${LANE_BIRD_PPM:-40.0}
+      - LANE_CURB_ENABLED=${LANE_CURB_ENABLED:-false}
+      - LANE_HORIZON_RATIO=${LANE_HORIZON_RATIO:-0.48}
+      - LANE_CAMERA_HEIGHT_M=${LANE_CAMERA_HEIGHT_M:-1.35}
     deploy:
       resources:
         reservations:

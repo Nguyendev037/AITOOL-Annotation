@@ -12,6 +12,19 @@ work/
 results/
 .browseruse/
 sam-service/checkpoints/
+model-service/weights/
 nuclio/build/
+# Local credentials and private keys
+*.p12
+*.pfx
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+secrets/
+.secrets/
 *.pem
 *.key
+# Keep the project plan versioned in Git.
+!Plan/
+!Plan/**

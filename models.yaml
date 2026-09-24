@@ -1,0 +1,162 @@
+# =============================================================================
+# MODEL REGISTRY — nguồn sự thật duy nhất cho "model nào đang bật"
+# =============================================================================
+#
+# Quan hệ với `taxonomy.yaml` (đừng trộn hai việc):
+#
+#   taxonomy.yaml  -> LABEL: tên label, shape, màu, map COCO, label ID trong CVAT
+#   models.yaml    -> MODEL: máy nào sinh ra annotation, đang bật hay tắt
+#
+# Một model trỏ tới label của mình qua `task`; `task` phải khớp một nhóm có
+# `task:` trong `taxonomy.yaml`. Nhờ vậy đổi model không kéo theo đổi label và
+# ngược lại. `tools/models.py check` kiểm cả hai chiều.
+#
+# Đổi hành vi bằng cách sửa file này, KHÔNG sửa Python:
+#
+#   python tools/models.py list
+#   python tools/models.py check
+#   python tools/models.py disable lane
+#   python tools/models.py enable  lane
+#   python tools/models.py sync-cvat --check     # xem trước, không đổi gì
+#   python tools/models.py sync-cvat             # triển khai / gỡ function thật
+#
+# `backend` quyết định chạy ở đâu:
+#   model-service  -> GPU, phục vụ qua `model-service/handlers/<handler>.py`,
+#                     CVAT gọi qua một nuclio function (`function`)
+#   local          -> chạy ngay trong tiến trình browser-agent (MediaPipe),
+#                     KHÔNG có nuclio function nên `sync-cvat` bỏ qua
+#
+# Nhiều model cùng một `task` được phép bật đồng thời; đúng một model mỗi task
+# mang `default: true` và đó là model dùng khi lệnh không chỉ định `--model`.
+# =============================================================================
+
+version: 1
+
+models:
+
+  # ---------------------------------------------------------------------------
+  # Object detection — Rectangle
+  # ---------------------------------------------------------------------------
+  - id: bbox-yolo26m
+    task: bbox
+    annotations: rectangle
+    backend: model-service
+    handler: detect
+    endpoint: /detect
+    function: smart-bbox
+    checkpoint: model-service/weights/yolo26m.pt
+    enabled: true
+    default: true
+    notes: >-
+      YOLO26m. COCO `rider` không có nên người lái xe bị nhận thành `pedestrian`;
+      label `rider` vẫn khai báo trong taxonomy để task có sẵn.
+
+  # ---------------------------------------------------------------------------
+  # Semantic segmentation — Polygon (19 lớp, gộp instance)
+  # ---------------------------------------------------------------------------
+  - id: semantic-eomt
+    task: semantic
+    annotations: polygon
+    backend: model-service
+    handler: segment
+    endpoint: /segment-semantic
+    function: smart-semantic
+    checkpoint: null
+    enabled: true
+    default: true
+    notes: >-
+      EoMT COCO-panoptic. Không có file trọng số cục bộ: `handlers/segment.py`
+      tải qua `transformers` theo `SEMANTIC_MODEL_ID`. `pole` và `rider` không có
+      trong COCO nên không sinh được.
+
+  # ---------------------------------------------------------------------------
+  # Drivable area — Polygon (dùng chung EoMT với semantic, xem _SEMANTIC_LOCK)
+  # ---------------------------------------------------------------------------
+  - id: drivable-eomt
+    task: drivable
+    annotations: polygon
+    backend: model-service
+    handler: segment
+    endpoint: /segment-drivable
+    function: smart-drivable
+    checkpoint: null
+    enabled: true
+    default: true
+    notes: >-
+      Xấp xỉ `area/drivable` từ COCO `road` và `area/alternative` từ
+      `pavement-merged`. Chia sẻ EoMT với `semantic-eomt` nên hai model này chạy
+      tuần tự trên cùng một GPU 8 GB, không song song.
+
+  # ---------------------------------------------------------------------------
+  # Lane marking — Polyline (CPU, classical CV, không tốn VRAM)
+  # ---------------------------------------------------------------------------
+  - id: lane-classical
+    task: lane
+    annotations: polyline
+    backend: model-service
+    handler: lane
+    endpoint: /segment-lane
+    function: smart-lane
+    checkpoint: null
+    enabled: true
+    default: true
+    notes: >-
+      Không có trọng số và không có model đã huấn luyện: đo mặt phẳng đường theo
+      mét qua ảnh bird's-eye. Recall giới hạn ở khoảng 40% dưới của khung hình.
+
+  # ---------------------------------------------------------------------------
+  # HumanPose-17 — Skeleton 17 điểm, chạy TẠI CHỖ (không qua model-service)
+  # ---------------------------------------------------------------------------
+  - id: pose17-mediapipe
+    task: pose17
+    annotations: skeleton
+    backend: local
+    handler: browser_agent.vision.mediapipe_pose
+    endpoint: null
+    function: null
+    checkpoint: mediapipe:pose_landmarker.task
+    enabled: true
+    default: true
+    notes: >-
+      MediaPipe Pose. Chạy trong tiến trình browser-agent nên không có nuclio
+      function: `sync-cvat` bỏ qua model này. `map_pose17` chọn trái/phải theo
+      toạ độ từng ảnh (quyết định B), không theo nhãn giải phẫu của model.
+
+  # ---------------------------------------------------------------------------
+  # Face Landmark VF-50 — Skeleton 50 điểm, chạy TẠI CHỖ
+  # ---------------------------------------------------------------------------
+  - id: face50-mediapipe
+    task: face50
+    annotations: skeleton
+    backend: local
+    handler: browser_agent.vision.mediapipe_pose
+    endpoint: null
+    function: null
+    checkpoint: mediapipe:face_landmarker.task
+    enabled: true
+    default: true
+    notes: >-
+      MediaPipe FaceMesh (468 đỉnh, dùng 50 điểm theo guideline VF-50). Không có
+      nuclio function: `sync-cvat` bỏ qua. File `.task` do
+      `browser_agent/vision/mediapipe_tasks.py` tải về đệm một lần.
+
+  # ---------------------------------------------------------------------------
+  # LiDAR 3D — Cuboid, CHỖ DÀNH SẴN cho model bổ sung sau
+  # ---------------------------------------------------------------------------
+  # Bản LiDAR v1 (mục 3 của plan/implement.md) KHÔNG dùng model học máy: nó đọc
+  # PCD, lọc theo vùng 6 giới hạn, gom cụm rồi tự fit cuboid. Vì vậy mục dưới
+  # đây tắt sẵn và chỉ là hợp đồng để sau này cắm detector 3D thật vào.
+  # Không bật mục này khi chưa có checkpoint đã kiểm chứng.
+  - id: lidar-cuboid-fit
+    task: lidar3d
+    annotations: cuboid_3d
+    backend: local
+    handler: lidar.cuboid
+    endpoint: null
+    function: null
+    checkpoint: null
+    enabled: false
+    default: false
+    notes: >-
+      Tắt có chủ ý. Đây là chỗ dành cho detector 3D học máy trong tương lai;
+      LiDAR v1 hiện dùng thuật toán fit hình học, không cần model.

@@ -1,0 +1,32 @@
+{
+  "_comment": [
+    "Luật số của hai bài Week 2, tách khỏi code để sửa được mà không phải sửa Python.",
+    "",
+    "Mỗi luật ở đây PHẢI khớp câu chữ trong tài liệu nguồn ở guildlline/. Kiểm tra",
+    "bằng: python tools/check_rules.py --check",
+    "",
+    "Vì sao vẫn là file cấu hình chứ không đọc thẳng từ markdown: câu chữ trong",
+    "guideline là văn xuôi, tự động suy ra hành vi từ đó sẽ sai âm thầm. Cách này giữ",
+    "một nguồn sự thật cho hành vi, đồng thời ÉP phát hiện lệch: nếu BTC đổi ngưỡng",
+    "trong tài liệu mà không ai cập nhật file này, check_rules báo lỗi ngay."
+  ],
+  "version": 1,
+  "face50": {
+    "_source": "Week2_Guideline_Face_Landmark_VF50_HocVien_v1.3.docx, mục 4.2",
+    "_rule": "Dưới ngưỡng thì đánh Outside CẢ skeleton, không phải từng điểm.",
+    "skeleton_min_points": {
+      "mattrai": {"minimum": 4, "total": 8},
+      "matphai": {"minimum": 4, "total": 8},
+      "longmaytrai": {"minimum": 3, "total": 5},
+      "longmayphai": {"minimum": 3, "total": 5},
+      "moingoai": {"minimum": 6, "total": 12},
+      "moitrong": {"minimum": 4, "total": 8}
+    },
+    "_songmui": "Guideline: 'Chỉ Outside khi cả sống mũi khuất' — không có ngưỡng số, nên không khai ở đây."
+  },
+  "pose17": {
+    "_source": "Week2_Guideline_HumanPose17_HocVien_v1.1.docx",
+    "min_visible_points": 1,
+    "_note": "Guideline chấm theo từng điểm, không có luật ngưỡng cả-skeleton cho pose."
+  }
+}

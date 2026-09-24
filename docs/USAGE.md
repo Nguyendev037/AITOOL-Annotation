@@ -32,6 +32,17 @@ docker compose up -d --build model-service
 docker compose up -d model-service
 ```
 
+> **Đừng xoá `model-service/.dockerignore`.** Nó loại `weights/` khỏi build context.
+> Đo thực tế: có file này, context là **1,11 kB** và Docker dùng lại cache
+> (`apt` CACHED, `git clone sam2` CACHED); thiếu nó, `COPY . /opt/service/` kéo
+> theo 44 MB weights, context nhảy lên **44,28 MB**, Docker **mất cache** và build
+> lại từ `apt-get` + clone SAM2 + tải torch — **~40 phút** thay vì vài giây.
+>
+> Hệ quả liên quan: mọi dòng `ENV` ở đầu `Dockerfile` đều nằm *trước* các layer
+> `RUN` nặng, nên sửa một biến ở đó sẽ vô hiệu hoá cache của tất cả layer phía
+> sau. Muốn đổi biến môi trường cho rẻ, sửa `docker-compose.yml` (`environment:`)
+> — lớp đó chỉ cần `docker compose up -d`, không cần build lại.
+
 ### 2.3. Kiểm tra health
 
 ```powershell
@@ -114,15 +125,11 @@ Response (rút gọn):
     { "label": "area/drivable", "coco_source": "road", "confidence": 0.93, "area_px": 284000,
       "polygons": [[110.0, 400.5, 210.0, 398.0, "..."]]
     }
-  ],
-  "lane_marking": {
-    "supported": false,
-    "reason": "COCO panoptic models do not contain the BDD100K lane/* classes."
-  }
+  ]
 }
 ```
 
-> **Drivable area** được xấp xỉ từ COCO: `road` → `area/drivable`, `pavement-merged` → `area/alternative`. **Lane marking không được sinh ra** (COCO không có class `lane/*`) — limitation rõ ràng.
+> **Drivable area** được xấp xỉ từ COCO: `road` → `area/drivable`, `pavement-merged` → `area/alternative`. Lane marking **không** nằm trong response này — nó có endpoint riêng `/segment-lane`, vì shape bắt buộc là Polyline chứ không phải Polygon.
 
 ### 4.3. SAM2 auto mask
 
@@ -170,7 +177,7 @@ Copy `.env.example` thành `.env` rồi chỉnh (Docker Compose tự đọc):
 
 | Biến | Mặc định | Mục đích |
 |---|---|---|
-| `YOLO26_MODEL` | `yolo26m.pt` | Weights YOLO26 (`yolo26m` / `yolo26s` nếu OOM) |
+| `YOLO26_MODEL` | `/weights/yolo26m.pt` | Weights YOLO26 (bind-mount read-only; xem mục 8) |
 | `YOLO26_CONF` | `0.25` | Ngưỡng confidence |
 | `YOLO26_IOU` | `0.45` | Ngưỡng NMS |
 | `SEMANTIC_BACKEND` | `eomt` | `segformer` / `mask2former` / `eomt` |
@@ -203,7 +210,51 @@ Cả hai đều nằm gọn trong 8 GB, **không OOM**.
 | `docker ps` permission denied | Mở Docker Desktop, daemon đang chạy |
 | `/health` `cuda_available: false` | Docker có GPU + NVIDIA runtime |
 | `checkpoint_exists: false` | Đảm bảo `sam-service/checkpoints/sam2.1_hiera_large.pt` tồn tại |
-| `/detect` lần đầu chậm | Đang tải `yolo26m.pt`; lần sau ~30-120 ms |
+| `/detect` treo > 1 phút, **mọi endpoint đều treo** | Thiếu `model-service/weights/yolo26m.pt` → ultralytics tải 42 MB từ GitHub (~26 KB/s) và chặn event loop. Xem `docker logs cvat-smart-model` |
+| `/detect` các lần sau | ~30-120 ms (model đã nạp vào VRAM) |
 | `/segment-drivable` lần đầu chậm | Đang tải EoMT-DINOv3 vào VRAM lần đầu |
 | `/segment-drivable` không có lane | Đúng giới hạn COCO (xem mục 4.2) |
-| YOLO26 không tải | Kiểm tra mạng khi build, volume `model-ultralytics` |
+| YOLO26 không tải | `model-service/weights/yolo26m.pt` phải tồn tại trên host; mount read-only tại `/weights` |
+| Một request chậm làm **mọi** endpoint treo | Endpoint bị đổi về `async def`. Xem mục 9 |
+| Request đồng thời gây OOM | Cache model dùng `lru_cache`, không khoá khi miss. Xem mục 9 |
+
+---
+
+## 9. Mô hình đồng thời — vì sao endpoint là `def`, không phải `async def`
+
+**Quy tắc: mọi endpoint suy luận trong `model-service/app.py` phải là `def`.**
+
+Handler bên dưới là code **blocking đồng bộ** (torch, transformers, ultralytics,
+OpenCV). FastAPI chạy endpoint `def` trong threadpool của Starlette, nên asyncio
+event loop rảnh và một request chậm chỉ làm chậm chính nó. Nếu khai báo
+`async def`, thân hàm chạy **trên** event loop: một lời gọi blocking sẽ đóng băng
+mọi request khác trong cùng tiến trình — kể cả `/health` và các endpoint không
+chia sẻ gì với nó.
+
+Đó chính là cách một lần tải 42 MB weights từ GitHub biến thành sập toàn bộ
+service. Đo được bằng `tools/bench_event_loop.py`:
+
+| | `/health` lúc rảnh | `/health` khi 16 request `/detect` chạy song song |
+|---|---:|---:|
+| `async def` (lỗi) | 26,1 ms | **max 295,7 ms** (11,3×) |
+| `def` (đúng) | — | chỉ chậm hơn không đáng kể |
+
+Chạy lại phép đo bất cứ lúc nào:
+
+```powershell
+python tools/bench_event_loop.py --image work/job_1573/frame_25/original.jpg --endpoint /detect --concurrency 16
+```
+
+Script in ra `EVENT LOOP FREE` hoặc `EVENT LOOP BLOCKED` (exit code 1 khi BLOCKED),
+nên dùng được như một kiểm tra hồi quy.
+
+### Khoá `_SEMANTIC_LOCK` / `_SAM2_LOCK` / `_YOLO_LOCK`
+
+`handlers/*` cache model bằng `lru_cache`, mà `lru_cache` **không khoá khi cache
+miss**: hai request nguội chạy đồng thời sẽ mỗi cái dựng một bản model riêng, và
+bản EoMT / SAM2 thứ hai không lọt vào 8 GB VRAM. Ba khoá này tuần tự hoá lần nạp
+đầu tiên giữa `/segment-semantic` + `/segment-drivable` (dùng chung EoMT),
+`/segment-auto` và `/detect`.
+
+`/segment-lane` chạy CPU thuần, không giữ model nào, nên **không** lấy khoá và
+vẫn song song được với các endpoint dùng GPU.

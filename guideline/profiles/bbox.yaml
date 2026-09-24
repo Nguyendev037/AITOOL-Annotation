@@ -1,0 +1,64 @@
+# SINH TỰ ĐỘNG bởi `python tools/guidelines.py generate`.
+# Đừng sửa tay: sửa `taxonomy.yaml` (label) hoặc tài liệu nguồn, rồi sinh lại.
+# `status: pending` nghĩa là CHƯA có hiệu lực — xem `reasons`.
+task: bbox
+source: Annotation_Guideline_BBox_Polygon_Polyline.pdf
+source_sha256: 63bce09da0e85b8803f2809fc7a90150663d6dd6d24984ec4d264efbf3711d61
+status: applied
+generated_by: tools/guidelines.py generate (offline)
+reasons: []
+entries:
+- document_label: pedestrian
+  model_label: pedestrian
+  shape: rectangle
+  support: full
+  evidence: pedestrian, rider, car, truck, bus, train,
+- document_label: rider
+  model_label: rider
+  shape: rectangle
+  support: full
+  evidence: pedestrian, rider, car, truck, bus, train,
+- document_label: car
+  model_label: car
+  shape: rectangle
+  support: full
+  evidence: pedestrian, rider, car, truck, bus, train,
+- document_label: truck
+  model_label: truck
+  shape: rectangle
+  support: full
+  evidence: pedestrian, rider, car, truck, bus, train,
+- document_label: bus
+  model_label: bus
+  shape: rectangle
+  support: full
+  evidence: pedestrian, rider, car, truck, bus, train,
+- document_label: train
+  model_label: train
+  shape: rectangle
+  support: full
+  evidence: pedestrian, rider, car, truck, bus, train,
+- document_label: motorcycle
+  model_label: motorcycle
+  shape: rectangle
+  support: full
+  evidence: Object instance Rectangle / Bounding Box motorcycle, bicycle, traffic
+    light, traffic
+- document_label: bicycle
+  model_label: bicycle
+  shape: rectangle
+  support: full
+  evidence: Object instance Rectangle / Bounding Box motorcycle, bicycle, traffic
+    light, traffic
+- document_label: traffic light
+  model_label: traffic light
+  shape: rectangle
+  support: full
+  evidence: Object instance Rectangle / Bounding Box motorcycle, bicycle, traffic
+    light, traffic
+- document_label: traffic sign
+  model_label: traffic sign
+  shape: rectangle
+  support: full
+  evidence: …instance Rectangle / Bounding Box motorcycle, bicycle, traffic light,
+    traffic sign Drivable area Polygon area/drivable, area/alternative lane/crosswalk,…

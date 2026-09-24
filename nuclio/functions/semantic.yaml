@@ -97,6 +97,8 @@ spec:
       workerAvailabilityTimeoutMilliseconds: 10000
       attributes:
         maxRequestBodySize: 67108864
+        # Fixed host port -- see section 3b in nuclio/README.md.
+        port: 9002
 
   platform:
     attributes:

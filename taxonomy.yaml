@@ -9,7 +9,7 @@
 #
 #   taxonomy.yaml
 #        │
-#        ├─► nuclio/functions/{bbox,semantic,drivable}.yaml
+#        ├─► nuclio/functions/{bbox,semantic,drivable,lane}.yaml
 #        │       metadata.annotations.spec   ← danh sách label CVAT hiển thị
 #        │
 #        ├─► model-service/taxonomy.json
@@ -115,34 +115,61 @@ groups:
   # ---------------------------------------------------------------------------
   # Nhóm 3 — Lane marking (Polyline)
   #
-  # KHÔNG có function nào sinh ra nhóm này: COCO panoptic không có class
-  # `lane/*`, và cả `train/1354` lẫn `train/1571` đều có 0 annotation cho
-  # nhóm này. Label vẫn được khai báo để công cụ tạo task CVAT tạo đủ label.
+  # Function `smart-lane` chạy detector classical-CV trên CPU (không tốn VRAM).
+  # Cách tiếp cận: chiếu mặt đường về ảnh "bird's-eye" theo MÉT rồi mới làm
+  # top-hat / connected-components / PCA, vì bề rộng vạch tính bằng pixel thay
+  # đổi hơn 10 lần trong một khung hình (f/Z).
+  #
+  # Hạn chế có thật, đã đo trên test/detect (25 ảnh):
+  #   * chỉ trace được ~40% dưới của khung (LANE_MAX_DEPTH_M=12 m) — cap depth
+  #     để bird raster không upsample nhiễu chân trời thành vạch giả;
+  #   * `lane/double *` chỉ tách được khi 2 nét còn phân giải;
+  #   * `lane/road curb` mặc định TẮT (LANE_CURB_ENABLED=false) — curb là biên
+  #     độ sâu, không phải vạch sáng; detector pure-CV cho quá nhiều FP.
   # ---------------------------------------------------------------------------
   - id: lane
     title: Lane marking
     shape: polyline
-    task: null
-    function: null
-    supported: false
-    unsupported_reason: >-
-      COCO panoptic has no `lane/*` class and the training sets contain zero
-      lane annotations, so no deployed model can produce polyline lane marking.
+    task: lane
+    function: smart-lane
+    model_title: Smart Lane Marking (Polyline)
+    help_message: >-
+      Lane markings as polylines, produced by a CPU-only classical-CV detector
+      on a metric bird's-eye view of the road.
+    description: >-
+      Lane-marking polylines from a CPU-only classical-CV detector. Scores the
+      road plane in metres via a bird's-eye view, so widths and gaps do not
+      drift with distance. No VRAM cost. Recall is limited: markings are traced
+      over roughly the bottom 40% of the frame, and lane/road curb is off by
+      default.
     labels:
       - name: lane/crosswalk
         coco: []
+        color: [0, 220, 220]
       - name: lane/double white
         coco: []
+        color: [255, 255, 255]
       - name: lane/double yellow
         coco: []
+        color: [255, 215, 0]
       - name: lane/road curb
         coco: []
+        color: [255, 0, 255]
+        note: >-
+          Mặc định tắt (LANE_CURB_ENABLED=false). Curb là biên độ sâu chứ không
+          phải vạch sáng; detector gradient cho quá nhiều false positive.
       - name: lane/single other
         coco: []
+        color: [150, 150, 255]
+        note: >-
+          Vạch không phân loại được là trắng hay vàng (colour vote không đạt
+          ngưỡng), hoặc vạch đôi màu không xác định.
       - name: lane/single white
         coco: []
+        color: [0, 255, 0]
       - name: lane/single yellow
         coco: []
+        color: [255, 140, 0]
 
   # ---------------------------------------------------------------------------
   # Nhóm 4 — Semantic segmentation (19 class Cityscapes)
@@ -203,3 +230,136 @@ groups:
         coco: [motorcycle]
       - name: bicycle
         coco: [bicycle]
+
+  # ---------------------------------------------------------------------------
+  # Nhóm 5 — HumanPose-17 (Skeleton 17 điểm)
+  #
+  # Vì sao nhóm này KHÔNG có `function`: bài này chạy tại chỗ bằng MediaPipe
+  # trong tiến trình browser-agent (`browser_agent/vision/`), không phục vụ qua
+  # model-service và không có nuclio function. Thiếu `function` là đúng chủ ý —
+  # `tools/models.py sync-cvat` bỏ qua nó thay vì đi tìm function không tồn tại.
+  #
+  # 17 sublabel đặt tên "1".."17" cho khớp `browser_agent/geometry.sublabel_name`,
+  # nơi sublabel luôn là chuỗi số. Đổi tên ở đây là phá luồng ghi CVAT.
+  # ---------------------------------------------------------------------------
+  - id: pose17
+    title: HumanPose-17
+    shape: skeleton
+    task: pose17
+    local: true
+    model_title: Smart HumanPose-17 (MediaPipe)
+    help_message: >-
+      Skeleton 17 điểm theo guideline HumanPose-17, chạy tại chỗ bằng MediaPipe.
+    description: >-
+      HumanPose-17 qua MediaPipe Pose, chạy trong tiến trình browser-agent nên
+      không tốn VRAM và không có nuclio function. Trái/phải được chọn theo toạ độ
+      từng ảnh (quyết định B), không theo nhãn giải phẫu của model.
+    labels:
+      - name: "1"
+      - name: "2"
+      - name: "3"
+      - name: "4"
+      - name: "5"
+      - name: "6"
+      - name: "7"
+      - name: "8"
+      - name: "9"
+      - name: "10"
+      - name: "11"
+      - name: "12"
+      - name: "13"
+      - name: "14"
+      - name: "15"
+      - name: "16"
+      - name: "17"
+
+  # ---------------------------------------------------------------------------
+  # Nhóm 6 — Face Landmark VF-50 (Skeleton 50 điểm)
+  #
+  # Cùng lý do nhóm 5: chạy tại chỗ bằng MediaPipe FaceMesh, không có function.
+  # 50 sublabel "0".."49" — chú ý guideline VF-50 đánh số từ 0, khác HumanPose-17
+  # đánh số từ 1. Đây là điểm dễ nhầm nhất giữa hai bài.
+  # ---------------------------------------------------------------------------
+  - id: face50
+    title: Face Landmark VF-50
+    shape: skeleton
+    task: face50
+    local: true
+    model_title: Smart Face Landmark VF-50 (MediaPipe)
+    help_message: >-
+      Skeleton 50 điểm theo guideline Face Landmark VF-50, chạy tại chỗ bằng MediaPipe.
+    description: >-
+      Face Landmark VF-50 qua MediaPipe FaceMesh (468 đỉnh, dùng 50 điểm theo
+      guideline). Chạy trong tiến trình browser-agent. 7 nhóm con (lông mày, mắt,
+      sống mũi, môi) nằm trong `browser_agent/geometry.FACE_SKELETONS`.
+    labels:
+      - name: "0"
+      - name: "1"
+      - name: "2"
+      - name: "3"
+      - name: "4"
+      - name: "5"
+      - name: "6"
+      - name: "7"
+      - name: "8"
+      - name: "9"
+      - name: "10"
+      - name: "11"
+      - name: "12"
+      - name: "13"
+      - name: "14"
+      - name: "15"
+      - name: "16"
+      - name: "17"
+      - name: "18"
+      - name: "19"
+      - name: "20"
+      - name: "21"
+      - name: "22"
+      - name: "23"
+      - name: "24"
+      - name: "25"
+      - name: "26"
+      - name: "27"
+      - name: "28"
+      - name: "29"
+      - name: "30"
+      - name: "31"
+      - name: "32"
+      - name: "33"
+      - name: "34"
+      - name: "35"
+      - name: "36"
+      - name: "37"
+      - name: "38"
+      - name: "39"
+      - name: "40"
+      - name: "41"
+      - name: "42"
+      - name: "43"
+      - name: "44"
+      - name: "45"
+      - name: "46"
+      - name: "47"
+      - name: "48"
+      - name: "49"
+
+  # ---------------------------------------------------------------------------
+  # Nhóm 7 — LiDAR 3D (Cuboid) — chỗ dành sẵn, chưa có model
+  #
+  # Nhóm này tồn tại để `models.yaml` khai được hợp đồng cho model LiDAR bổ sung
+  # sau, đúng yêu cầu "chừa hợp đồng cho model LiDAR 3D". Bản LiDAR v1 KHÔNG dùng
+  # nhóm này: nó fit cuboid bằng hình học, không phân lớp vật thể, nên cố ý để
+  # `supported: false` và không có model nào bật.
+  # ---------------------------------------------------------------------------
+  - id: lidar3d
+    title: LiDAR 3D cuboid
+    shape: cuboid_3d
+    task: lidar3d
+    local: true
+    supported: false
+    unsupported_reason: >-
+      Chưa có model 3D đã kiểm chứng. LiDAR v1 chỉ fit cuboid hình học từ vùng
+      điểm người dùng chọn và không tự nhận diện lớp vật thể.
+    labels:
+      - name: Object3D

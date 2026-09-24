@@ -278,7 +278,7 @@ def main() -> None:
             drivable_rows.append({
                 "file": p.name, "ok": True, "latency_ms": r["_latency_ms"],
                 "raw_segment_count": r.get("raw_segment_count"),
-                "drivable": dr, "lane_supported": r.get("lane_marking", {}).get("supported"),
+                "drivable": dr,
                 "backend": r.get("backend"), "memory": r.get("memory"),
             })
             prev = out / "previews" / "drivable" / f"{p.stem}.jpg"

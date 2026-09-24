@@ -1,0 +1,10 @@
+# YOLO26 weights are bind-mounted read-only at runtime
+# (see `docker-compose.yml`: ./model-service/weights:/weights:ro) and resolved
+# through the absolute `YOLO26_MODEL=/weights/yolo26m.pt` env var. Baking a
+# second 44 MB copy into the image serves no purpose; it only bloats the build
+# context and the layer that `COPY . /opt/service/` produces.
+weights/
+
+__pycache__/
+*.py[cod]
+.pytest_cache/

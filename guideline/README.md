@@ -40,7 +40,7 @@ Sơ đồ kiến trúc nằm tại [../docs/ARCHITECTURE.md](../docs/ARCHITECTUR
 
 `lane/crosswalk`, `lane/double white`, `lane/double yellow`, `lane/road curb`, `lane/single other`, `lane/single white`, `lane/single yellow`
 
-> **Trạng thái inference (EoMT COCO-panoptic):** drivable area được **xấp xỉ** từ `road` → `area/drivable` và `pavement-merged` → `area/alternative`. Lane marking **không được sinh ra** vì COCO không có class `lane/*` — cần label polyline riêng để train.
+> **Trạng thái inference:** drivable area được **xấp xỉ** từ `road` → `area/drivable` và `pavement-merged` → `area/alternative` (EoMT COCO-panoptic). Lane marking **đã có model riêng** — `smart-lane` chạy detector classical CV trên CPU (không tốn VRAM), trace được `lane/single white|yellow|other` ở ~40% dưới khung hình; `lane/double *`, `lane/crosswalk` và `lane/road curb` chưa đáng tin — xem `nuclio/README.md` mục 7.
 
 ### Nhóm 4 — Semantic segmentation (19 class)
 
@@ -69,6 +69,42 @@ Model YOLO26 map COCO → guideline. Chỉ giữ các class object được guid
 
 > Lưu ý: lệnh đồng bộ `python -m app.main --sync-guidelines` thuộc kiến trúc cũ đã bị gỡ bỏ. Khi cần chuẩn hóa guideline mới, tạo Markdown thủ công từ PDF gốc trong `guildlline/`, rồi cập nhật `taxonomy.yaml` và chạy `python tools/sync_taxonomy.py --write`.
 
+## Luật số của agent — `rules/week2-rules.json`
+
+Ngưỡng annotation (ví dụ "mắt ≥ 4/8 điểm") **không nằm trong code** mà nằm trong
+[`../rules/week2-rules.json`](../rules/week2-rules.json). Sửa file đó là hành vi agent
+đổi ngay — không cần sửa Python.
+
+Bộ kiểm tra đọc ngưỡng **thẳng từ bảng trong tài liệu nguồn `.docx`** và so với luật
+đang dùng, nên không thể lệch âm thầm:
+
+```powershell
+python tools/check_rules.py            # in luật đang dùng + nguồn ghi gì
+python tools/check_rules.py --check    # thoát khác 0 nếu lệch (dùng trong CI)
+```
+
+Vì sao đối chiếu với `.docx` nguồn chứ không phải bản Markdown sinh ra: bước sinh
+Markdown (`tools/sync_guidelines.py`) cần `DEEPSEEK_API_KEY` và **hiện không chạy được**
+vì `.env` thiếu key. Mốc đối chiếu phải là thứ BTC phát hành.
+
+Agent **không tự sửa** luật từ câu chữ tài liệu — guideline là văn xuôi tự do, tự suy
+ra hành vi từ đó sẽ sai lặng lẽ. Agent chỉ **phát hiện** và **báo**; người chốt luật.
+
 > `tools/gen_labels.py` là generator cũ (gọi LLM, có cả task `keypoint` không
 > tồn tại trong guideline). Nó **không** được nối vào pipeline deploy và không
 > còn là nguồn sự thật — dùng `tools/sync_taxonomy.py`.
+
+<!-- BEGIN GENERATED SOURCES -->
+
+### Tài liệu nguồn và bản trích xuất tự động
+
+Sinh bởi `python tools/sync_all.py`. Đừng sửa tay vùng này.
+
+| Tài liệu nguồn (`guildlline/`) | sha256 | Trạng thái | Bản trích xuất |
+|---|---|---|---|
+| `Annotation_Guideline_BBox_Polygon_Polyline.pdf` | `63bce09da0e8` | không đổi | [`guideline/generated/annotation-guideline-bbox-polygon-polyline.md`](guideline/generated/annotation-guideline-bbox-polygon-polyline.md) |
+| `Semantic_Segmentation_Annotation_Guideline.pdf` | `8d8d1dc910b2` | không đổi | [`guideline/generated/semantic-segmentation-annotation-guideline.md`](guideline/generated/semantic-segmentation-annotation-guideline.md) |
+| `Week2_Guideline_Face_Landmark_VF50_HocVien_v1.3.docx` | `ac1e0e342e2d` | không đổi | [`guideline/generated/week2-guideline-face-landmark-vf50-hocvien-v1-3.md`](guideline/generated/week2-guideline-face-landmark-vf50-hocvien-v1-3.md) |
+| `Week2_Guideline_HumanPose17_HocVien_v1.1.docx` | `98b33f2abf58` | không đổi | [`guideline/generated/week2-guideline-humanpose17-hocvien-v1-1.md`](guideline/generated/week2-guideline-humanpose17-hocvien-v1-1.md) |
+
+<!-- END GENERATED SOURCES -->

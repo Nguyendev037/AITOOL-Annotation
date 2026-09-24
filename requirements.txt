@@ -5,3 +5,13 @@
 openai>=1.0
 pypdf>=4.0
 python-docx>=1.1
+
+# Suy luận landmark tại chỗ (bài Face VF-50 và HumanPose-17).
+# KHÔNG ghim bản cũ: `mediapipe_pose.py` tự chọn API — bản 0.10.x dùng
+# `mediapipe.solutions` (model nhúng sẵn), bản 1.x dùng Tasks API và tải file
+# `.task` về đệm một lần (xem `browser_agent/vision/mediapipe_tasks.py`).
+# Máy không có mạng: tải `.task` thủ công rồi đặt biến
+# BROWSER_AGENT_MEDIAPIPE_MODEL_DIR trỏ tới thư mục chứa model.
+mediapipe>=0.10.21
+numpy>=1.26
+Pillow>=10.0

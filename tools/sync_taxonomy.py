@@ -40,7 +40,12 @@ TAXONOMY_YAML = ROOT / "taxonomy.yaml"
 RUNTIME_JSON = ROOT / "model-service" / "taxonomy.json"
 FUNCTIONS_DIR = ROOT / "nuclio" / "functions"
 
-VALID_SHAPES = {"rectangle", "polygon", "polyline", "points", "skeleton", "mask"}
+#: `cuboid_3d` is not a CVAT 2D shape: it is the LiDAR 3D contract group in
+#: `taxonomy.yaml` (mục 7), which declares `supported: false` because no verified
+#: 3D model exists yet. It is accepted here so the group can be declared; nothing
+#: renders a label spec for it because a group without `function` is never
+#: collected as a function-yaml target.
+VALID_SHAPES = {"rectangle", "polygon", "polyline", "points", "skeleton", "mask", "cuboid_3d"}
 WRAP_WIDTH = 76
 
 
@@ -79,8 +84,22 @@ def load_taxonomy(path: Path = TAXONOMY_YAML) -> dict:
         if task:
             if task in seen_tasks:
                 raise SystemExit(f"taxonomy.yaml: duplicate task {task!r}")
-            if not group.get("function"):
-                raise SystemExit(f"group {gid!r}: `task` set but `function` missing")
+            # A task either runs through a nuclio function here, or declares
+            # itself local (chạy tại chỗ trong browser-agent, ví dụ MediaPipe cho
+            # pose17/face50). "Local" must be explicit: silently allowing a
+            # missing `function` would let a typo drop a GPU task out of
+            # deployment without anyone noticing.
+            if group.get("local") is True:
+                if group.get("function"):
+                    raise SystemExit(
+                        f"group {gid!r}: `local: true` nhưng vẫn khai `function`; "
+                        "model tại chỗ không có nuclio function"
+                    )
+            elif not group.get("function"):
+                raise SystemExit(
+                    f"group {gid!r}: `task` set but `function` missing "
+                    "(khai `local: true` nếu bài này chạy tại chỗ, không qua nuclio)"
+                )
             seen_tasks.add(task)
         elif group.get("supported") is not False:
             raise SystemExit(
